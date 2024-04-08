@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
   //
 
   @override
@@ -299,7 +301,7 @@ class _BottomNavigationDemoState extends State<HomeScreen> {
                 ),
               ),
               SizedBox(
-                  height: 500,
+                  height: 430,
                   child: GridView.count(
                     physics: NeverScrollableScrollPhysics(),
                     // Disable scrolling
@@ -318,16 +320,20 @@ class _BottomNavigationDemoState extends State<HomeScreen> {
                             children: [
                               SizedBox(
                                   height: 90.sp,
-                                  child: Image.asset("assets/customImages/testFlatImg.jpg",fit: BoxFit.fill,)),
+                                  child: Image.asset(
+                                    "assets/customImages/testFlatImg.jpg",
+                                    fit: BoxFit.fill,
+                                  )),
                               Padding(
                                 padding: const EdgeInsets.only(top: 5.0),
                                 child: Row(
-                                                            children: [
+                                  children: [
                                     Text(
-
-                                      'Renovated Luxury Apartme'.length > 22 ?  'Renovated Luxury Apartme'.substring(0, 22) + '...' :  'Renovated Luxury Apartme',
-
-
+                                      'Renovated Luxury Apartme'.length > 22
+                                          ? 'Renovated Luxury Apartme'
+                                                  .substring(0, 22) +
+                                              '...'
+                                          : 'Renovated Luxury Apartme',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: GoogleFonts.poppins(
@@ -335,7 +341,8 @@ class _BottomNavigationDemoState extends State<HomeScreen> {
                                             fontSize: 12.sp,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black),
-                                      ),),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -345,13 +352,20 @@ class _BottomNavigationDemoState extends State<HomeScreen> {
                                   children: [
                                     Row(
                                       children: [
-                                        Icon(Icons.location_on,size: 11.sp,color: Colors.red,),
+                                        Icon(
+                                          Icons.location_on,
+                                          size: 11.sp,
+                                          color: Colors.red,
+                                        ),
                                       ],
                                     ),
                                     Text(
-                                      '2021 San Pedro, Los Angeles 90'.length > 25 ?  '2021 San Pedro, Los Angeles 90'.substring(0, 25) + '...' :  '2021 San Pedro, Los Angeles 90',
-
-
+                                      '2021 San Pedro, Los Angeles 90'.length >
+                                              25
+                                          ? '2021 San Pedro, Los Angeles 90'
+                                                  .substring(0, 25) +
+                                              '...'
+                                          : '2021 San Pedro, Los Angeles 90',
                                       maxLines: 1,
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(
@@ -359,7 +373,8 @@ class _BottomNavigationDemoState extends State<HomeScreen> {
                                           fontWeight: FontWeight.normal,
                                           color: HexColor('#9ba3aa'),
                                         ),
-                                      ),)
+                                      ),
+                                    )
                                   ],
                                 ),
                               ),
@@ -368,10 +383,7 @@ class _BottomNavigationDemoState extends State<HomeScreen> {
                                 child: Row(
                                   children: [
                                     Text(
-
                                       '₹ ',
-
-
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: GoogleFonts.poppins(
@@ -379,12 +391,10 @@ class _BottomNavigationDemoState extends State<HomeScreen> {
                                             fontSize: 14.sp,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black),
-                                      ),),
+                                      ),
+                                    ),
                                     Text(
-
-                                       '5000',
-
-
+                                      '5000',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: GoogleFonts.poppins(
@@ -392,19 +402,191 @@ class _BottomNavigationDemoState extends State<HomeScreen> {
                                             fontSize: 14.sp,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black),
-                                      ),),
-
-
+                                      ),
+                                    ),
                                   ],
                                 ),
                               )
-
                             ],
                           ),
                         ),
                       ),
                     ),
-                  ))
+                  )),
+              Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Row(
+                  children: [
+                    Text(
+                      'Top Flats',
+                      style: GoogleFonts.poppins(
+                        textStyle: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                    ),
+                    Spacer(),
+                    Text(
+                      'View all',
+                      style: GoogleFonts.poppins(
+                        textStyle: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.normal,
+                          color: HexColor('#9ba3aa'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(
+                  height: 500.sp,
+                  child: ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: 4, // Set the number of items
+                    itemBuilder: (BuildContext context, int index) {
+                      // Here you can build your list item based on the index
+                      return Container(
+                        height: 75.sp,
+                        decoration: BoxDecoration(
+                          color: HexColor('#f6f6f7'),
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        margin: EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: double.infinity,
+
+                              width: 90.sp,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                              margin: EdgeInsets.all(8.0),
+
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  child: Image(
+                                    image: AssetImage('assets/customImages/testFlatImg.jpg'),
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+
+                            ),
+
+                         Column(
+                           mainAxisAlignment: MainAxisAlignment.start,
+
+                           children: [
+                             Padding(
+                               padding: const EdgeInsets.only(top: 5.0),
+                               child: Row(
+                                 children: [
+                                   Text(
+                                     'Renovated Luxury Apartme'.length > 28
+                                         ? 'Renovated Luxury Apartme'
+                                         .substring(0, 28) +
+                                         '...'
+                                         : 'Renovated Luxury Apartme',
+                                     maxLines: 1,
+                                     overflow: TextOverflow.ellipsis,
+                                     style: GoogleFonts.poppins(
+                                       textStyle: TextStyle(
+                                           fontSize: 14.sp,
+                                           fontWeight: FontWeight.bold,
+                                           color: Colors.black),
+                                     ),
+                                   ),
+                                 ],
+                               ),
+                             ),
+                             Padding(
+                               padding: const EdgeInsets.only(top: 5.0),
+                               child: Row(
+                                 children: [
+                                   Row(
+                                     children: [
+                                       Icon(
+                                         Icons.location_on,
+                                         size: 11.sp,
+                                         color: Colors.red,
+                                       ),
+                                     ],
+                                   ),
+                                   Text(
+                                     '2021 San Pedro, Los Angeles 90'.length >
+                                         32
+                                         ? '2021 San Pedro, Los Angeles 90'
+                                         .substring(0, 32) +
+                                         '...'
+                                         : '2021 San Pedro, Los Angeles 90',
+                                     maxLines: 1,
+                                     style: GoogleFonts.poppins(
+                                       textStyle: TextStyle(
+                                         fontSize: 13.sp,
+                                         fontWeight: FontWeight.normal,
+                                         color: HexColor('#9ba3aa'),
+                                       ),
+                                     ),
+                                   )
+                                 ],
+                               ),
+                             ),
+                             Row(
+                               mainAxisAlignment: MainAxisAlignment.start,
+
+                               children: [
+                                 Text(
+                                   '₹ ',
+                                   maxLines: 1,
+                                   overflow: TextOverflow.ellipsis,
+                                   style: GoogleFonts.poppins(
+                                     textStyle: TextStyle(
+                                         fontSize: 14.sp,
+                                         fontWeight: FontWeight.bold,
+                                         color: Colors.black),
+                                   ),
+                                 ),
+                                 Text(
+                                   '5000',
+                                   maxLines: 1,
+                                   overflow: TextOverflow.ellipsis,
+                                   style: GoogleFonts.poppins(
+                                     textStyle: TextStyle(
+                                         fontSize: 14.sp,
+                                         fontWeight: FontWeight.bold,
+                                         color: Colors.black),
+                                   ),
+                                 ),
+                                 Text(
+                                   ' Per Month',
+                                   maxLines: 1,
+                                   overflow: TextOverflow.ellipsis,
+                                   style: GoogleFonts.poppins(
+                                     textStyle: TextStyle(
+                                         fontSize: 14.sp,
+                                         fontWeight: FontWeight.bold,
+                                         color: Colors.black),
+                                   ),
+                                 ),
+
+                               ],
+                             ),
+                           ],
+                         )
+
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+              ),
+
+
             ],
           ))
         ],
