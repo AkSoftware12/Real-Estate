@@ -61,6 +61,7 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   int _selectedIndex = 0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   void _onItemTapped(int index) {
     setState(() {
@@ -71,13 +72,19 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
 
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: Row(
           children: [
-            Container(
+
+            GestureDetector(
+            onTap: () {
+              _scaffoldKey.currentState?.openDrawer();
+              },
+            child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30), // Border radius for rounded corners
                 border: Border.all(
@@ -93,6 +100,7 @@ class _HomepageState extends State<Homepage> {
                 width: 17.sp, // Image width
                 height: 17.sp, // Image height
               ),
+            ),
             ),
 
             Padding(
@@ -169,6 +177,39 @@ class _HomepageState extends State<Homepage> {
 
 
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Drawer Header',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.home),
+              title: Text('Home'),
+              onTap: () {
+                // Navigate to home screen
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Settings'),
+              onTap: () {
+                // Navigate to settings screen
+              },
+            ),
+          ],
+        ),
       ),
       body: Homepage._widgetOptions.elementAt(_selectedIndex),
 
