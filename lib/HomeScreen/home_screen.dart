@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
 import 'package:realestate/Utils/color.dart';
+import 'package:realestate/Utils/textSize.dart';
 
 import '../Model/property_type.dart';
 
@@ -18,10 +19,18 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _BottomNavigationDemoState extends State<HomeScreen> {
-  final List<String> items = ['1 Bhk', '2 Bhk', '3 Bhk', '4 Bhk', '5 Bhk'];
+
+  PageController _pageController = PageController(initialPage: 0);
 
   int _selectedIndex = 0;
-  PageController _pageController = PageController(initialPage: 0);
+  bool isLiked = false;
+  bool download = false;
+  int selectIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -33,48 +42,105 @@ class _BottomNavigationDemoState extends State<HomeScreen> {
       );
     });
   }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        // backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        title:  Padding(
-          padding: const EdgeInsets.all(0.0),
-          child: BottomNavigationBar(
-            backgroundColor: Colors.white,
-            items:  <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: SizedBox.shrink(), // Replace the icon with an empty SizedBox
-                label: 'Residential', // Keep the text label
-              ),
-              BottomNavigationBarItem(
-                icon: SizedBox.shrink(),
-                label: 'Commercial',
-              ),
-            ],
-            currentIndex: _selectedIndex,
-            selectedItemColor: Colors.orangeAccent,
-            onTap: _onItemTapped,
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+
+      // Existing MaterialApp code...
+      home: Scaffold(
+        // backgroundColor: const Color(0xFF222B40),
+        backgroundColor: Colors.white,
+
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          automaticallyImplyLeading: false,
+          title: Padding(
+            padding: EdgeInsets.all(0.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      _onItemTapped(0);
+                    },
+                    child: Card(
+                      color: _selectedIndex == 0
+                          ? Colors.orangeAccent
+                          : Colors.white,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Center(
+                          child: Text(
+                            'Residential',
+                            style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                  color: _selectedIndex == 0
+                                      ? Colors.white
+                                      : Colors.orangeAccent,
+                                  fontSize: TextSizes.textmedium,
+                                  fontWeight: FontWeight.normal,
+                                  overflow: TextOverflow.ellipsis),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      _onItemTapped(1);
+                    },
+                    child: Card(
+                      color: _selectedIndex == 1
+                          ? Colors.orangeAccent
+                          : Colors.white,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Center(
+                          child: Text(
+                            'Commercial',
+                            style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                  color: _selectedIndex == 1
+                                      ? Colors.white
+                                      : Colors.orangeAccent,
+                                  fontSize: TextSizes.textmedium,
+                                  fontWeight: FontWeight.normal,
+                                  overflow: TextOverflow.ellipsis),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
+          // Add this line to remove the back button
         ),
-        // Add this line to remove the back button
-      ),
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        children: [
-          ResidentialScreen(),
-          CommercialScreen(),
-        ],
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          children: [
+            ResidentialScreen(),
+            CommercialScreen(),
+          ],
+        ),
       ),
     );
   }
 }
+
+
 
 class ResidentialScreen extends StatelessWidget {
 
@@ -378,7 +444,8 @@ class ResidentialScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                  )),
+                  )
+              ),
               Padding(
                 padding: const EdgeInsets.all(15.0),
                 child: Row(
