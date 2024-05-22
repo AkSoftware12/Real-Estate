@@ -45,7 +45,7 @@ class Homepage extends StatefulWidget {
 
   static List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
-    ApartmentListing(),
+    ApartmentListing(backButton: '',),
     SearchScreen(),
     CityGrid(),
     AccountPage(),

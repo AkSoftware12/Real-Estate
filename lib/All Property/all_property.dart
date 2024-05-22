@@ -5,9 +5,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
+import 'package:realestate/Property%20Deatils/property_deatils.dart';
 import 'package:realestate/Utils/textSize.dart';
 
 class ApartmentListing extends StatefulWidget {
+  final String backButton;
+
+  const ApartmentListing({super.key, required this.backButton});
   @override
   State<ApartmentListing> createState() => _ApartmentListingState();
 }
@@ -20,6 +24,19 @@ class _ApartmentListingState extends State<ApartmentListing> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
+
+
+            if(widget.backButton== 'back')
+            Padding(
+              padding:  EdgeInsets.only(bottom: 8.sp),
+              child: AppBar(
+                title: Text('All Property ',
+                style: TextStyle(
+                  color: Colors.black
+                ),),
+
+              ),
+            ),
             Container(
               width: double.infinity,
               height: 50.sp,
@@ -68,279 +85,284 @@ class _ApartmentListingState extends State<ApartmentListing> {
               child: ListView.builder(
                 itemCount: 10,
                   itemBuilder: (BuildContext context, int index) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: HexColor('#f6f6f7'),
-                        borderRadius: BorderRadius.circular(5.0),
-                      ),
-                      margin: EdgeInsets.all(8.0),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Container(
-                              height: 110.sp,
-                              width: double.infinity,
+                    return GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: HexColor('#f6f6f7'),
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        margin: EdgeInsets.all(2.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Column(
+                            children: [
+                              Container(
+                                height: 110.sp,
+                                width: double.infinity,
 
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(5.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                      height: 110.sp,
+                                      width: double.infinity,
+                                      child: Image.asset(
+                                        "assets/customImages/testFlatImg.jpg",
+                                        fit: BoxFit.fill,
+                                      )),
+                                ),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                    height: 110.sp,
-                                    width: double.infinity,
-                                    child: Image.asset(
-                                      "assets/customImages/testFlatImg.jpg",
-                                      fit: BoxFit.fill,
-                                    )),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'Renovated Luxury Apartme',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5.0),
-                              child: Row(
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: Row(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.location_on,
+                                          size: 13.sp,
+                                          color: Colors.red,
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      '2021 San Pedro, Los Angeles 90',
+                                      maxLines: 1,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                          fontSize: 11.sp,
+                                          fontWeight: FontWeight.normal,
+                                          color: HexColor('#9ba3aa'),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      '₹ ',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                    Text(
+                                      '5000',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.star, color: Colors.orange,size: 15.sp,),
+                                        SizedBox(width: 4),
+                                        Text('4.5',
+                                        style: TextStyle(color: Colors.black),),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              Padding(
+                                padding:  EdgeInsets.only(top: 8.sp),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    'Renovated Luxury Apartme',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
+                                  Container(
+                                    height: 40.sp,
+                                    color: Colors.white,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/bed_solid.svg',
+                                            width: 15.sp,
+                                            height: 12.sp,
+                                          ),
+                                          SizedBox(width: 5.sp,),
+                                          Center(
+                                            child: Text(' Furnished',
+                                              style: GoogleFonts.poppins(
+                                                textStyle: TextStyle(
+                                                    fontSize: TextSizes.textsmall,
+                                                    fontWeight: FontWeight.normal,
+                                                    color: Colors.black),
+                                              ),),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5.0),
-                              child: Row(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.location_on,
-                                        size: 13.sp,
-                                        color: Colors.red,
-                                      ),
-                                    ],
+                                  SizedBox(
+                                    width: 5.sp,
                                   ),
-                                  Text(
-                                    '2021 San Pedro, Los Angeles 90',
-                                    maxLines: 1,
-                                    style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(
-                                        fontSize: 11.sp,
-                                        fontWeight: FontWeight.normal,
-                                        color: HexColor('#9ba3aa'),
+                                  Container(
+                                    height: 40.sp,
+                                    color: Colors.white,
+
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/car_solid.svg',
+                                            width: 15.sp,
+                                            height: 12.sp,
+                                          ),
+                                          SizedBox(width: 5.sp,),
+                                          Center(
+                                            child: Text(' Car Parking',
+                                              style: GoogleFonts.poppins(
+                                                textStyle: TextStyle(
+                                                    fontSize: TextSizes.textsmall,                                                fontWeight: FontWeight.normal,
+                                                    color: Colors.black),
+                                              ),),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 5.sp,
+                                  ),
+                                  Container(
+                                    color: Colors.white,
+
+                                    height: 40.sp,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/people_group_solid.svg',
+                                            width: 15.sp,
+                                            height: 12.sp,
+                                          ),
+                                          SizedBox(width: 5.sp,),
+                                          Center(
+                                            child: Text(' For Family',
+                                              style: GoogleFonts.poppins(
+                                                textStyle: TextStyle(
+                                                    fontSize: TextSizes.textsmall,                                                fontWeight: FontWeight.normal,
+                                                    color: Colors.black),
+                                              ),),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   )
                                 ],
+                                ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              Padding(
+                                padding:  EdgeInsets.only(top: 15.sp,bottom: 15.sp),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    '₹ ',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
+                                  Container(
+                                    height: 40.sp,
+                                    color: Colors.white,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: GestureDetector(
+                                        onTap: (){
+
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Center(
+                                              child: Padding(
+                                                padding:  EdgeInsets.only(left: 15.sp,right: 15.sp),
+                                                child: Text(' Contact Agent',
+                                                  style: GoogleFonts.poppins(
+                                                    textStyle: TextStyle(
+                                                        fontSize: TextSizes.textmedium,
+                                                        fontWeight: FontWeight.normal,
+                                                        color: Colors.black),
+                                                  ),),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                  Text(
-                                    '5000',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
+
+                                  Container(
+                                    color: Colors.white,
+
+                                    height: 40.sp,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: GestureDetector(
+                                        onTap: (){
+
+                                        },
+                                        child: Row(
+                                          children: [
+
+                                            Center(
+                                              child: Padding(
+                                                padding:  EdgeInsets.only(left: 15.sp,right: 15.sp),
+                                                child: Text('View Location',
+                                                  style: GoogleFonts.poppins(
+                                                    textStyle: TextStyle(
+                                                        fontSize: TextSizes.textmedium,                                                fontWeight: FontWeight.normal,
+                                                        color: Colors.black),
+                                                  ),),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  Spacer(),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.star, color: Colors.orange,size: 15.sp,),
-                                      SizedBox(width: 4),
-                                      Text('4.5',
-                                      style: TextStyle(color: Colors.black),),
-                                    ],
-                                  ),
+                                  )
                                 ],
+                                ),
                               ),
-                            ),
-
-                            Padding(
-                              padding:  EdgeInsets.only(top: 8.sp),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  height: 40.sp,
-                                  color: Colors.white,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      children: [
-                                        SvgPicture.asset(
-                                          'assets/bed_solid.svg',
-                                          width: 15.sp,
-                                          height: 12.sp,
-                                        ),
-                                        SizedBox(width: 5.sp,),
-                                        Center(
-                                          child: Text(' Furnished',
-                                            style: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                  fontSize: TextSizes.textsmall,
-                                                  fontWeight: FontWeight.normal,
-                                                  color: Colors.black),
-                                            ),),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 5.sp,
-                                ),
-                                Container(
-                                  height: 40.sp,
-                                  color: Colors.white,
-
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      children: [
-                                        SvgPicture.asset(
-                                          'assets/car_solid.svg',
-                                          width: 15.sp,
-                                          height: 12.sp,
-                                        ),
-                                        SizedBox(width: 5.sp,),
-                                        Center(
-                                          child: Text(' Car Parking',
-                                            style: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                  fontSize: TextSizes.textsmall,                                                fontWeight: FontWeight.normal,
-                                                  color: Colors.black),
-                                            ),),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 5.sp,
-                                ),
-                                Container(
-                                  color: Colors.white,
-
-                                  height: 40.sp,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      children: [
-                                        SvgPicture.asset(
-                                          'assets/people_group_solid.svg',
-                                          width: 15.sp,
-                                          height: 12.sp,
-                                        ),
-                                        SizedBox(width: 5.sp,),
-                                        Center(
-                                          child: Text(' For Family',
-                                            style: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                  fontSize: TextSizes.textsmall,                                                fontWeight: FontWeight.normal,
-                                                  color: Colors.black),
-                                            ),),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              ],
-                              ),
-                            ),
-                            Padding(
-                              padding:  EdgeInsets.only(top: 15.sp,bottom: 15.sp),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  height: 40.sp,
-                                  color: Colors.white,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: GestureDetector(
-                                      onTap: (){
-
-                                      },
-                                      child: Row(
-                                        children: [
-                                          Center(
-                                            child: Padding(
-                                              padding:  EdgeInsets.only(left: 15.sp,right: 15.sp),
-                                              child: Text(' Contact Agent',
-                                                style: GoogleFonts.poppins(
-                                                  textStyle: TextStyle(
-                                                      fontSize: TextSizes.textmedium,
-                                                      fontWeight: FontWeight.normal,
-                                                      color: Colors.black),
-                                                ),),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                Container(
-                                  color: Colors.white,
-
-                                  height: 40.sp,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: GestureDetector(
-                                      onTap: (){
-
-                                      },
-                                      child: Row(
-                                        children: [
-
-                                          Center(
-                                            child: Padding(
-                                              padding:  EdgeInsets.only(left: 15.sp,right: 15.sp),
-                                              child: Text('View Location',
-                                                style: GoogleFonts.poppins(
-                                                  textStyle: TextStyle(
-                                                      fontSize: TextSizes.textmedium,                                                fontWeight: FontWeight.normal,
-                                                      color: Colors.black),
-                                                ),),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              ],
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     );
