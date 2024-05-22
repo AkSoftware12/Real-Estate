@@ -25,18 +25,10 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
 
 
   final List<String> _images = [
-    'https://freepngimg.com/thumb/vegetable/9-2-vegetable-free-download-png.png',
-    'https://i.pinimg.com/736x/9e/1f/5b/9e1f5b5a9d1d92191e410cc9a734ff50.jpg',
-    'https://img.freepik.com/free-photo/green-broccoli-levitating-white-background_485709-79.jpg',
-    'https://pngimg.com/uploads/cabbage/small/cabbage_PNG8803.png',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRe2DcljRuOkGIHmSRwTHL4lDNg8BiYtlz0KQ&usqp=CAU',
-    'https://www.winedesign.com.au/wp-content/uploads/2016/05/DSC_0499.png',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcST7LTLdC8SNtKl0mKZ2FpS71sijEXYfD_EcwUQfhnqBQe30khWPxHmKr4rDuwjS7TUqC4&usqp=CAU',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZbFBExP1N084WuUGJgRuwwTAY10cb0QOU9Q&usqp=CAU',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8449UAxHMQgrcbgUt_KuTDbNZbDyEG6xFkQ&usqp=CAU',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzwdyCPZkAPbl7UPwCxrGiQ28l1mPiXyQUQQ&usqp=CAU',
-    'https://banner2.cleanpng.com/20180408/yte/kisspng-fast-food-restaurant-junk-food-kfc-hamburger-junk-food-5aca9ac191eb27.0987335415232273295977.jpg',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHBfARWpfkb5M-2zA0UY62Es3ozcDOD2fsarzzY66zNesJO-xhpSwgVb8k2d291vx9RBI&usqp=CAU',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoz_5HDm5Raa-Imfc-OnNf-KXwzA2Ox3Zcp0nbFoEFtzCaY5mVg_V3Xpxc2ovY5FsmLOs&usqp=CAU',
+    'https://www.pngmart.com/files/15/Vector-Home-PNG-Photos.png',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDsWnStDcZz9gMZfigH_LesuQiplssDYUr5jYqV-f5DQ&s',
+    'https://5.imimg.com/data5/JS/DP/IQ/IOS-69757314/product-jpeg-500x500.png',
   ];
 
   @override
@@ -160,8 +152,58 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                     ),
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      Container(
+                        color: HexColor('#f6f6f7'),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                onTap: (){
+
+                                  // Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+
+                                  // Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+
+                                },
+                                child: SizedBox(
+                                    height: 35.sp,
+                                    child: Container(
+                                      width: 100.sp,
+                                      height: 35.sp,
+
+                                      decoration: BoxDecoration(
+                                        color: HexColor('#212529'),
+                                        borderRadius: BorderRadius.circular(10.0),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            spreadRadius: 2,
+                                            blurRadius: 7,
+                                            offset: Offset(0, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Center(child: Text('1 Bhk',
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                              fontSize: 15.sp,
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.white
+                                          ),
+                                        ),
+                                      )),
+                                    )
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+
                       Container(
                         color: HexColor('#f6f6f7'),
                         child: Padding(
@@ -187,55 +229,6 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                     height: 1.sp,
                     color: Colors.grey.shade200,
 
-                  ),
-                  Container(
-                    color: HexColor('#f6f6f7'),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                            onTap: (){
-
-                              // Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
-
-                              // Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
-
-                            },
-                            child: SizedBox(
-                              height: 35.sp,
-                              child: Container(
-                                width: 100.sp,
-                                height: 40.sp,
-
-                                decoration: BoxDecoration(
-                                  color: HexColor('#212529'),
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 2,
-                                      blurRadius: 7,
-                                      offset: Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(child: Text('1 Bhk',
-                                  style: GoogleFonts.poppins(
-                                    textStyle: TextStyle(
-                                        fontSize: 15.sp,
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.white
-                                    ),
-                                  ),
-                                )),
-                              )
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
                   ),
 
                   Padding(
@@ -1270,7 +1263,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
 
                               },
                               body: Container(
-                                height: 150.sp,
+                                height: 250.sp,
                                 width: double.infinity,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
@@ -1279,112 +1272,267 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                       height: 1.sp,
                                       color: Colors.grey.shade200,
                                     ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
 
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
 
-                                            Padding(
-                                              padding: const EdgeInsets.all(0.0),
-                                              child:Padding(
-                                                padding:  EdgeInsets.only(top: 5.sp,),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      "Q. Any restriction for visitors or guest?" ,
-                                                      style: GoogleFonts.radioCanada(
-                                                        // Replace with your desired Google Font
-                                                        textStyle: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: TextSizes.textsmall2,
-                                                          // Adjust font size as needed
-                                                          fontWeight: FontWeight
-                                                              .normal, // Adjust font weight as needed
-                                                          // Adjust font color as needed
+                                              Padding(
+                                                padding: const EdgeInsets.all(0.0),
+                                                child:Padding(
+                                                  padding:  EdgeInsets.only(top: 5.sp,),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        "Q. Any restriction for visitors or guest?" ,
+                                                        style: GoogleFonts.radioCanada(
+                                                          // Replace with your desired Google Font
+                                                          textStyle: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: TextSizes.textsmall2,
+                                                            // Adjust font size as needed
+                                                            fontWeight: FontWeight
+                                                                .normal, // Adjust font weight as needed
+                                                            // Adjust font color as needed
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    Text(
-                                                      "Ans. No Restrictions." ,
-                                                      style: GoogleFonts.radioCanada(
-                                                        // Replace with your desired Google Font
-                                                        textStyle: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: TextSizes.textsmall2,
-                                                          // Adjust font size as needed
-                                                          fontWeight: FontWeight
-                                                              .normal, // Adjust font weight as needed
-                                                          // Adjust font color as needed
+                                                      Text(
+                                                        "Ans. No Restrictions." ,
+                                                        style: GoogleFonts.radioCanada(
+                                                          // Replace with your desired Google Font
+                                                          textStyle: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: TextSizes.textsmall2,
+                                                            // Adjust font size as needed
+                                                            fontWeight: FontWeight
+                                                                .normal, // Adjust font weight as needed
+                                                            // Adjust font color as needed
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                     Divider(
-                                                      height: 5.sp,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ],
+                                                       Divider(
+                                                        height: 5.sp,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
-                                            ),
 
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-
-                                                  Text(
-                                                    "Invertor :" ,
-                                                    style: GoogleFonts.radioCanada(
-                                                      // Replace with your desired Google Font
-                                                      textStyle: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: TextSizes.textsmall2,
-                                                        // Adjust font size as needed
-                                                        fontWeight: FontWeight
-                                                            .bold, // Adjust font weight as needed
-                                                        // Adjust font color as needed
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-
-                                                  Text(
-                                                    "Security :" ,
-                                                    style: GoogleFonts.radioCanada(
-                                                      // Replace with your desired Google Font
-                                                      textStyle: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: TextSizes.textsmall2,
-                                                        // Adjust font size as needed
-                                                        fontWeight: FontWeight
-                                                            .bold, // Adjust font weight as needed
-                                                        // Adjust font color as needed
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
+                                            ],
+                                          ),
 
 
-                                          ],
-                                        ),
-
-
-                                      ],
+                                        ],
+                                      ),
                                     ),
+                                    Divider(
+                                      height: 1.sp,
+                                      color: Colors.grey.shade200,
+                                    ),
+
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+
+                                              Padding(
+                                                padding: const EdgeInsets.all(0.0),
+                                                child:Padding(
+                                                  padding:  EdgeInsets.only(top: 5.sp,),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        "Q. Any restriction for visitors or guest?" ,
+                                                        style: GoogleFonts.radioCanada(
+                                                          // Replace with your desired Google Font
+                                                          textStyle: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: TextSizes.textsmall2,
+                                                            // Adjust font size as needed
+                                                            fontWeight: FontWeight
+                                                                .normal, // Adjust font weight as needed
+                                                            // Adjust font color as needed
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "Ans. No Restrictions." ,
+                                                        style: GoogleFonts.radioCanada(
+                                                          // Replace with your desired Google Font
+                                                          textStyle: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: TextSizes.textsmall2,
+                                                            // Adjust font size as needed
+                                                            fontWeight: FontWeight
+                                                                .normal, // Adjust font weight as needed
+                                                            // Adjust font color as needed
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Divider(
+                                                        height: 5.sp,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+
+                                            ],
+                                          ),
+
+
+                                        ],
+                                      ),
+                                    ),
+                                    Divider(
+                                      height: 1.sp,
+                                      color: Colors.grey.shade200,
+                                    ),
+
+
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+
+                                              Padding(
+                                                padding: const EdgeInsets.all(0.0),
+                                                child:Padding(
+                                                  padding:  EdgeInsets.only(top: 5.sp,),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        "Q. Any restriction for visitors or guest?" ,
+                                                        style: GoogleFonts.radioCanada(
+                                                          // Replace with your desired Google Font
+                                                          textStyle: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: TextSizes.textsmall2,
+                                                            // Adjust font size as needed
+                                                            fontWeight: FontWeight
+                                                                .normal, // Adjust font weight as needed
+                                                            // Adjust font color as needed
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "Ans. No Restrictions." ,
+                                                        style: GoogleFonts.radioCanada(
+                                                          // Replace with your desired Google Font
+                                                          textStyle: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: TextSizes.textsmall2,
+                                                            // Adjust font size as needed
+                                                            fontWeight: FontWeight
+                                                                .normal, // Adjust font weight as needed
+                                                            // Adjust font color as needed
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Divider(
+                                                        height: 5.sp,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+
+                                            ],
+                                          ),
+
+
+                                        ],
+                                      ),
+                                    ),
+                                    Divider(
+                                      height: 1.sp,
+                                      color: Colors.grey.shade200,
+                                    ),
+
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+
+                                              Padding(
+                                                padding: const EdgeInsets.all(0.0),
+                                                child:Padding(
+                                                  padding:  EdgeInsets.only(top: 5.sp,),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        "Q. Any restriction for visitors or guest?" ,
+                                                        style: GoogleFonts.radioCanada(
+                                                          // Replace with your desired Google Font
+                                                          textStyle: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: TextSizes.textsmall2,
+                                                            // Adjust font size as needed
+                                                            fontWeight: FontWeight
+                                                                .normal, // Adjust font weight as needed
+                                                            // Adjust font color as needed
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "Ans. No Restrictions." ,
+                                                        style: GoogleFonts.radioCanada(
+                                                          // Replace with your desired Google Font
+                                                          textStyle: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: TextSizes.textsmall2,
+                                                            // Adjust font size as needed
+                                                            fontWeight: FontWeight
+                                                                .normal, // Adjust font weight as needed
+                                                            // Adjust font color as needed
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Divider(
+                                                        height: 5.sp,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+
+                                            ],
+                                          ),
+
+
+                                        ],
+                                      ),
+                                    ),
+
 
                                   ],
                                 ),
