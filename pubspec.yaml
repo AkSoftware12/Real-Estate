@@ -39,6 +39,9 @@ dependencies:
   flutter_screenutil: ^5.9.0
   shared_preferences: ^2.0.9
   flutter_svg: ^2.0.10+1
+  image_picker: ^1.0.4
+  fluttertoast: ^8.2.1
+
 
 
 
