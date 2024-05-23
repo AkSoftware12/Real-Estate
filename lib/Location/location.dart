@@ -3,9 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:realestate/All%20Property/all_property.dart';
+import 'package:realestate/HexColorCode/HexColor.dart';
+import 'package:realestate/Search/search.dart';
 import 'package:realestate/Utils/textSize.dart';
 
-class CityGrid extends StatelessWidget {
+class CityGrid extends StatefulWidget {
+  final String backButton;
+  const CityGrid({super.key, required this.backButton});
+
+  @override
+  State<CityGrid> createState() => _CityGridState();
+}
+
+class _CityGridState extends State<CityGrid> {
   final List<Map<String, String>> cities = [
     {'name': 'Dehradun', 'icon': 'assets/dehradun.png'},
     {'name': 'Mumbai', 'icon': 'assets/mumbai.png'},
@@ -22,17 +33,40 @@ class CityGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
+    return Scaffold(
+      backgroundColor:  (widget.backButton == 'back')?HexColor('#f6f6f7'):Colors.white,
+
+      appBar: (widget.backButton == 'back')?
+    AppBar(
+      backgroundColor: HexColor('#f6f6f7'),
+      title: Text(
+        'Popular Cities',
+        style: TextStyle(color: Colors.black),
       ),
-      itemCount: cities.length,
-      itemBuilder: (context, index) {
-        return CityIcon(
-          name: cities[index]['name'].toString(),
-          iconPath: cities[index]['icon']!,
-        );
-      },
+      actions: [
+        Padding(
+          padding:  EdgeInsets.only(right: 8.sp),
+          child: GestureDetector(
+            onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>  SearchScreen(backButton: 'back')),);
+
+            },
+              child: Icon(Icons.search,size: 25.sp,)),
+        ),
+      ],
+    ): null,
+      body:GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+        ),
+        itemCount: cities.length,
+        itemBuilder: (context, index) {
+          return CityIcon(
+            name: cities[index]['name'].toString(),
+            iconPath: cities[index]['icon']!,
+          );
+        },
+      ),
     );
   }
 }
@@ -46,7 +80,8 @@ class CityIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> ApartmentListing(backButton: 'back')),);
 
       },
       child: Column(
@@ -65,7 +100,6 @@ class CityIcon extends StatelessWidget {
                   ),
                 ],
               ),
-
               child: Padding(
                 padding: EdgeInsets.all(15.sp),
                 child: Image.asset(iconPath, height: 50, width: 50),

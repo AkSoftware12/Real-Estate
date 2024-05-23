@@ -6,9 +6,15 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/Account/account.dart';
 import 'package:realestate/All%20Property/all_property.dart';
+import 'package:realestate/ChangePassword/change_password.dart';
+import 'package:realestate/ForgotPassword/forgot_password.dart';
 import 'package:realestate/HomePage/home_page.dart';
 import 'package:realestate/HomeScreen/home_screen.dart';
 import 'package:realestate/Location/location.dart';
+import 'package:realestate/LoginPage/login_page.dart';
+import 'package:realestate/NotificationScreen/notification.dart';
+import 'package:realestate/Profile%20Update/profile_update.dart';
+import 'package:realestate/Property%20Deatils/property_deatils.dart';
 import 'package:realestate/Search/search.dart';
 import 'package:realestate/Utils/color.dart';
 import 'package:realestate/Utils/string.dart';
@@ -46,9 +52,9 @@ class Homepage extends StatefulWidget {
   static List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
     ApartmentListing(backButton: '',),
-    SearchScreen(),
-    CityGrid(),
-    AccountPage(),
+    SearchScreen(backButton: '',),
+    CityGrid(backButton: '',),
+    AccountPage(backButton: '',),
   ];
 
   @override
@@ -114,7 +120,10 @@ class _HomepageState extends State<Homepage> {
                 width: 30.sp,
                 height: 30.sp,
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=> AccountPage(backButton: 'back',)),);
+
+                  },
                   child: Container(
                       child: ClipRRect(
                           borderRadius: BorderRadius.circular(30),
@@ -152,25 +161,31 @@ class _HomepageState extends State<Homepage> {
               )),
             ),
             Spacer(),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                // Border radius for rounded corners
-                border: Border.all(
-                  color: Colors.grey, // Border color
-                  width: 2, // Border width
+            GestureDetector(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> NotificationScreen()),);
+
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  // Border radius for rounded corners
+                  border: Border.all(
+                    color: Colors.grey, // Border color
+                    width: 2, // Border width
+                  ),
                 ),
-              ),
-              width: 30.sp,
-              // Container width
-              height: 30.sp,
-              // Container height
-              alignment: Alignment.center,
-              // Align child widget to center
-              child: Image.asset(
-                "assets/notification.png", // Path to your image asset
-                width: 20.sp, // Image width
-                height: 20.sp, // Image height
+                width: 30.sp,
+                // Container width
+                height: 30.sp,
+                // Container height
+                alignment: Alignment.center,
+                // Align child widget to center
+                child: Image.asset(
+                  "assets/notification.png", // Path to your image asset
+                  width: 20.sp, // Image width
+                  height: 20.sp, // Image height
+                ),
               ),
             ),
           ],
@@ -193,10 +208,16 @@ class _HomepageState extends State<Homepage> {
                 child: Padding(
                   padding: EdgeInsets.only(top: 50.sp, bottom: 20.sp),
                   child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 30, // Adjust the radius as needed
-                      backgroundImage: AssetImage(
-                          'assets/images/icons/profile.png'), // Provide your image path
+                    leading: GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> AccountPage(backButton: 'back',)),);
+
+                      },
+                      child: CircleAvatar(
+                        radius: 30, // Adjust the radius as needed
+                        backgroundImage: AssetImage(
+                            'assets/images/icons/profile.png'), // Provide your image path
+                      ),
                     ),
                     title: Text(
                       "Hi, James Charley!",
@@ -300,7 +321,7 @@ class _HomepageState extends State<Homepage> {
                           ),
                         ),
                         onTap: () {
-                          Navigator.of(context).pop(); // Close the drawer
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginPage()),);
                           // Navigator.push(
                           //   context,
                           //   MaterialPageRoute(builder: (context) => SettingsScreen()),
@@ -357,26 +378,7 @@ class _HomepageState extends State<Homepage> {
                               ],
                             );
 
-                            //   ListTile(
-                            //   leading: Icon(
-                            //     Icons.account_circle,
-                            //     color: Colors.black,
-                            //   ),
-                            //   title:Text(
-                            //     " Profile ",
-                            //     style: GoogleFonts.poppins(
-                            //       // Replace with your desired Google Font
-                            //       textStyle: TextStyle(
-                            //         color: Colors.black,
-                            //         fontSize: TextSizes.textmedium,
-                            //         // Adjust font size as needed
-                            //         fontWeight: FontWeight
-                            //             .normal, // Adjust font weight as needed
-                            //         // Adjust font color as needed
-                            //       ),
-                            //     ),
-                            //   ),
-                            // );
+
                           },
                           body: Padding(
                             padding:  EdgeInsets.only(left: 10.sp,right: 10.sp),
@@ -391,6 +393,7 @@ class _HomepageState extends State<Homepage> {
                                     children: [
                                       GestureDetector(
                                         onTap: (){
+                                          Navigator.push(context, MaterialPageRoute(builder: (context)=> AccountPage(backButton: 'back',)),);
 
                                         },
                                         child: Padding(
@@ -413,10 +416,12 @@ class _HomepageState extends State<Homepage> {
                                       ),
                                     ],
                                   ),
+                                  SizedBox(height: 5.sp,),
                                   Row(
                                     children: [
                                       GestureDetector(
                                         onTap: (){
+                                          Navigator.push(context, MaterialPageRoute(builder: (context)=> ProfileUpdatePage()),);
 
                                         },
                                         child: Padding(
@@ -793,6 +798,7 @@ class _HomepageState extends State<Homepage> {
                                             padding:  EdgeInsets.only(left: 15.sp),
                                             child: GestureDetector(
                                               onTap: (){
+                                                Navigator.push(context, MaterialPageRoute(builder: (context)=> CityGrid(backButton: 'back')),);
 
                                               },
                                               child: Text(
@@ -974,6 +980,7 @@ class _HomepageState extends State<Homepage> {
                                     children: [
                                       GestureDetector(
                                         onTap: (){
+                                          Navigator.push(context, MaterialPageRoute(builder: (context)=> ChangePasswordPage()),);
 
                                         },
                                         child: Padding(
@@ -1000,6 +1007,7 @@ class _HomepageState extends State<Homepage> {
                                     children: [
                                       GestureDetector(
                                         onTap: (){
+                                          Navigator.push(context, MaterialPageRoute(builder: (context)=> ForgotPasswordPage()),);
 
                                         },
                                         child: Padding(
@@ -1312,7 +1320,7 @@ class _HomepageState extends State<Homepage> {
                           ),
                         ),
                         onTap: () {
-                          Navigator.of(context).pop(); // Close the drawer
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginPage()),);
                           // Navigator.push(
                           //   context,
                           //   MaterialPageRoute(builder: (context) => SettingsScreen()),

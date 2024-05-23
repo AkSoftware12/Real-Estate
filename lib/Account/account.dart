@@ -9,6 +9,9 @@ import 'package:realestate/Profile%20Update/profile_update.dart';
 import 'package:realestate/Utils/textSize.dart';
 
 class AccountPage extends StatefulWidget {
+  final String backButton;
+  const AccountPage({super.key, required this.backButton});
+
   @override
   State<AccountPage> createState() => _AccountPageState();
 }
@@ -20,6 +23,18 @@ class _AccountPageState extends State<AccountPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            if(widget.backButton== 'back')
+              Padding(
+                padding:  EdgeInsets.only(bottom: 0.sp),
+                child: AppBar(
+                  backgroundColor: HexColor('#f6f6f7'),
+                  title: Text('Profile',
+                    style: TextStyle(
+                        color: Colors.black
+                    ),),
+
+                ),
+              ),
             Stack(
               children: [
                 Container(

@@ -6,8 +6,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/All%20Property/all_property.dart';
+import 'package:realestate/AllImage/All_image_property.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
+import 'package:realestate/Model/image_model.dart';
+import 'package:realestate/Property%20Deatils/property_deatils.dart';
 import 'package:realestate/Utils/textSize.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+
 
 class PropertyDeatilsPage extends StatefulWidget {
   const PropertyDeatilsPage({super.key});
@@ -24,13 +30,29 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
   bool _isExpanded34 = true;
 
 
-  final List<String> _images = [
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoz_5HDm5Raa-Imfc-OnNf-KXwzA2Ox3Zcp0nbFoEFtzCaY5mVg_V3Xpxc2ovY5FsmLOs&usqp=CAU',
-    'https://www.pngmart.com/files/15/Vector-Home-PNG-Photos.png',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDsWnStDcZz9gMZfigH_LesuQiplssDYUr5jYqV-f5DQ&s',
-    'https://5.imimg.com/data5/JS/DP/IQ/IOS-69757314/product-jpeg-500x500.png',
+  final List<ImageModel> images = [
+    ImageModel(imageUrl:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoz_5HDm5Raa-Imfc-OnNf-KXwzA2Ox3Zcp0nbFoEFtzCaY5mVg_V3Xpxc2ovY5FsmLOs&usqp=CAU',),
+    ImageModel(imageUrl:    'https://www.pngmart.com/files/15/Vector-Home-PNG-Photos.png',),
+    ImageModel(imageUrl:    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDsWnStDcZz9gMZfigH_LesuQiplssDYUr5jYqV-f5DQ&s',),
+    ImageModel(imageUrl:    'https://5.imimg.com/data5/JS/DP/IQ/IOS-69757314/product-jpeg-500x500.png',),
+
   ];
 
+  _launchURL(url) async {
+    try {
+      launch(url);
+    } catch (error, stack) {
+      // log error
+    }
+  }
+
+  _getDirection(url) async {
+    try {
+      launch(url);
+    } catch (error, stack) {
+      // log error
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +88,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                             },
                             child: AspectRatio(
                               aspectRatio: 2.5,
-                              child: CarouselSlider(items:_images.map((item) =>
+                              child: CarouselSlider(items:images.map((item) =>
                                   Padding(
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 5,
@@ -96,7 +118,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
 
                                           },
                                           child: Image.network(
-                                            item,
+                                            item!.imageUrl.toString(),
                                             fit: BoxFit.fill,
                                           ),
                                         ),
@@ -136,7 +158,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                           ),
                           const SizedBox(height: 1),
                           DotsIndicator(
-                            dotsCount: _images.isEmpty?1:_images.length,
+                            dotsCount: images.isEmpty?1:images.length,
                             position: _dotPosition,
                             decorator: const DotsDecorator(
                               activeColor: Colors.orange,
@@ -211,7 +233,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                           child: GestureDetector(
                             onTap: (){
 
-                              // Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=> AllImageProperty(items: images,)),);
 
                               // Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
 
@@ -1592,7 +1614,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                             },
                             child: AspectRatio(
                               aspectRatio: .96,
-                              child: CarouselSlider(items:_images.map((item) =>
+                              child: CarouselSlider(items:images.map((item) =>
                                   Padding(
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 5,
@@ -1646,9 +1668,14 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                                       child: SizedBox(
                                                           height: 110.sp,
                                                           width: double.infinity,
-                                                          child: Image.asset(
-                                                            "assets/customImages/testFlatImg.jpg",
-                                                            fit: BoxFit.fill,
+                                                          child: ClipRRect(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            child: Image.asset(
+                                                              "assets/customImages/testFlatImg.jpg",
+                                                              height: 160.sp,
+                                                              width: double.infinity,
+                                                              fit: BoxFit.fill,
+                                                            ),
                                                           )),
                                                     ),
                                                   ),
@@ -1744,7 +1771,13 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                                       children: [
                                                         Container(
                                                           height: 40.sp,
-                                                          color: Colors.white,
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.white,
+
+                                                            borderRadius: BorderRadius.circular(10.sp),
+                                                            // Border radius for rounded corners
+
+                                                          ),
                                                           child: Padding(
                                                             padding: const EdgeInsets.all(8.0),
                                                             child: Row(
@@ -1773,7 +1806,13 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                                         ),
                                                         Container(
                                                           height: 40.sp,
-                                                          color: Colors.white,
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.white,
+
+                                                            borderRadius: BorderRadius.circular(10.sp),
+                                                            // Border radius for rounded corners
+
+                                                          ),
 
                                                           child: Padding(
                                                             padding: const EdgeInsets.all(8.0),
@@ -1801,7 +1840,13 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                                           width: 5.sp,
                                                         ),
                                                         Container(
-                                                          color: Colors.white,
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.white,
+
+                                                            borderRadius: BorderRadius.circular(10.sp),
+                                                            // Border radius for rounded corners
+
+                                                          ),
 
                                                           height: 40.sp,
                                                           child: Padding(
@@ -1836,24 +1881,32 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                                       children: [
                                                         Container(
                                                           height: 40.sp,
-                                                          color: Colors.white,
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.black,
+
+
+                                                            borderRadius: BorderRadius.circular(10.sp),
+                                                            // Border radius for rounded corners
+
+                                                          ),
                                                           child: Padding(
                                                             padding: const EdgeInsets.all(8.0),
                                                             child: GestureDetector(
                                                               onTap: (){
+                                                                _launchURL("tel://${6397199758}");
 
                                                               },
                                                               child: Row(
                                                                 children: [
                                                                   Center(
                                                                     child: Padding(
-                                                                      padding:  EdgeInsets.only(left: 15.sp,right: 15.sp),
+                                                                      padding:  EdgeInsets.only(left: 25.sp,right: 25.sp),
                                                                       child: Text(' Contact Agent',
                                                                         style: GoogleFonts.poppins(
                                                                           textStyle: TextStyle(
-                                                                              fontSize: TextSizes.textmedium,
+                                                                              fontSize: TextSizes.textsmall2,
                                                                               fontWeight: FontWeight.normal,
-                                                                              color: Colors.black),
+                                                                              color: Colors.white),
                                                                         ),),
                                                                     ),
                                                                   ),
@@ -1863,31 +1916,44 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                                           ),
                                                         ),
 
-                                                        Container(
-                                                          color: Colors.white,
 
-                                                          height: 40.sp,
-                                                          child: Padding(
-                                                            padding: const EdgeInsets.all(8.0),
-                                                            child: GestureDetector(
-                                                              onTap: (){
+                                                        GestureDetector(
+                                                          onTap: (){
+                                                            _getDirection(
+                                                                'https://www.google.com/maps/search/?api=1&query=${30.3303616},${78.0081215}');
+                                                          },
+                                                          child: Container(
+                                                            decoration: BoxDecoration(
+                                                              color: HexColor('#122636'),
 
-                                                              },
-                                                              child: Row(
-                                                                children: [
+                                                              borderRadius: BorderRadius.circular(10.sp),
+                                                              // Border radius for rounded corners
 
-                                                                  Center(
-                                                                    child: Padding(
-                                                                      padding:  EdgeInsets.only(left: 15.sp,right: 15.sp),
-                                                                      child: Text('View Location',
-                                                                        style: GoogleFonts.poppins(
-                                                                          textStyle: TextStyle(
-                                                                              fontSize: TextSizes.textmedium,                                                fontWeight: FontWeight.normal,
-                                                                              color: Colors.black),
-                                                                        ),),
+                                                            ),
+                                                            height: 40.sp,
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.all(8.0),
+                                                              child: GestureDetector(
+                                                                onTap: (){
+                                                                  _getDirection(
+                                                                      'https://www.google.com/maps/search/?api=1&query=${30.3303616},${78.0081215}');
+                                                                },
+                                                                child: Row(
+                                                                  children: [
+
+                                                                    Center(
+                                                                      child: Padding(
+                                                                        padding:  EdgeInsets.only(left: 25.sp,right: 25.sp),
+                                                                        child: Text('View Location',
+                                                                          style: GoogleFonts.poppins(
+                                                                            textStyle: TextStyle(
+                                                                                fontSize: TextSizes.textsmall2,                                                fontWeight: FontWeight.normal,
+                                                                                color: Colors.white),
+                                                                          ),),
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                ],
+                                                                  ],
+                                                                ),
                                                               ),
                                                             ),
                                                           ),
@@ -1986,21 +2052,27 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                       color: HexColor('#212529'), // Set your desired color
                     ),
 
-                    child: Center(
-                      child: Padding(
-                        padding:  EdgeInsets.only(left: 35.sp,right: 35.sp),
-                        child: Row(
-                          children: [
-                            Icon(Icons.call,color: Colors.white,),
-                            SizedBox(width: 5.sp,),
-                            Text(' Contact Agent',
-                              style: GoogleFonts.poppins(
-                                textStyle: TextStyle(
-                                    fontSize: TextSizes.textmedium,
-                                    fontWeight: FontWeight.normal,
-                                    color: Colors.white),
-                              ),),
-                          ],
+                    child: GestureDetector(
+                        onTap: (){
+                          _launchURL("tel://${6397199758}");
+
+                        },
+                      child: Center(
+                        child: Padding(
+                          padding:  EdgeInsets.only(left: 35.sp,right: 35.sp),
+                          child: Row(
+                            children: [
+                              Icon(Icons.call,color: Colors.white,),
+                              SizedBox(width: 5.sp,),
+                              Text(' Contact Agent',
+                                style: GoogleFonts.poppins(
+                                  textStyle: TextStyle(
+                                      fontSize: TextSizes.textmedium,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.white),
+                                ),),
+                            ],
+                          ),
                         ),
                       ),
                     ),

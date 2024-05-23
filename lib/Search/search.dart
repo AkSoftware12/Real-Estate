@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:realestate/All%20Property/all_property.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
 import 'package:realestate/Utils/textSize.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  final String backButton;
+  const SearchScreen({super.key, required this.backButton});
 
   @override
   _PropertySearchScreenState createState() => _PropertySearchScreenState();
@@ -43,7 +45,16 @@ class _PropertySearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor:  Colors.white,
 
+      appBar: (widget.backButton == 'back')?
+      AppBar(
+        backgroundColor: Colors.white,
+        title: Text(
+          'Search Property',
+          style: TextStyle(color: Colors.black),
+        ),
+      ): null,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(10.0),
@@ -55,6 +66,12 @@ class _PropertySearchScreenState extends State<SearchScreen> {
                   ToggleButtons(
                     isSelected: _isSelected,
                     onPressed: _handleToggleButton,
+                    color: Colors.black, // Color for unselected text/icons
+                    selectedColor: Colors.white, // Color for selected text/icons
+                    fillColor: HexColor('#122636'), // Background color for selected buttons
+                    borderColor: Colors.grey, // Border color for unselected buttons
+                    selectedBorderColor: HexColor('#122636'), // Border color for selected buttons
+                    borderRadius: BorderRadius.circular(15.0),
                     children: <Widget>[
                       Padding(
                         padding: const EdgeInsets.all(16.0),
@@ -175,53 +192,66 @@ class _PropertySearchScreenState extends State<SearchScreen> {
                           ToggleButtons(
                             isSelected: _isSelectedPro,
                             onPressed: _handleToggleButtonPro,
+                            color: Colors.black, // Color for unselected text/icons
+                            selectedColor: Colors.white, // Color for selected text/icons
+                            fillColor: HexColor('#122636'), // Background color for selected buttons
+                            borderColor: Colors.grey, // Border color for unselected buttons
+                            selectedBorderColor: HexColor('#122636'), // Border color for selected buttons
+                            borderRadius: BorderRadius.circular(15.0),
+
                             children: <Widget>[
                               Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Container(
-                                    width: 100.sp,
-                                    child: Center(child: Row(
+                                  width: 100.sp,
+                                  child: Center(
+                                    child: Row(
                                       children: [
                                         Icon(Icons.home_outlined),
-                                        SizedBox(width: 5.sp,),
+                                        SizedBox(width: 5.sp),
                                         Center(
-                                          child: Text(' Flats',
+                                          child: Text(
+                                            'Flats',
                                             style: GoogleFonts.poppins(
                                               textStyle: TextStyle(
-                                                  fontSize: TextSizes.textsmall,
-                                                  fontWeight: FontWeight.normal,
-                                                  color: Colors.black),
-                                            ),),
+                                                fontSize: TextSizes.textsmall,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          ),
                                         ),
-
                                       ],
-                                    ))),
+                                    ),
+                                  ),
+                                ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Container(
-                                    width: 100.sp,
-                                    child: Center(child: Row(
+                                  width: 100.sp,
+                                  child: Center(
+                                    child: Row(
                                       children: [
                                         Icon(Icons.home_outlined),
-                                        SizedBox(width: 5.sp,),
+                                        SizedBox(width: 5.sp),
                                         Center(
-                                          child: Text(' House',
+                                          child: Text(
+                                            'House',
                                             style: GoogleFonts.poppins(
                                               textStyle: TextStyle(
-                                                  fontSize: TextSizes.textsmall,
-                                                  fontWeight: FontWeight.normal,
-                                                  color: Colors.black),
-                                            ),),
+                                                fontSize: TextSizes.textsmall,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          ),
                                         ),
-
                                       ],
-                                    ))),
+                                    ),
+                                  ),
+                                ),
                               ),
-
-
                             ],
-                          ),
+                          )
                         ],
                       ),
                     ),
@@ -259,15 +289,23 @@ class _PropertySearchScreenState extends State<SearchScreen> {
                     child: ChoiceChip(
                       label: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('${index + 1} Bhk',style: TextStyle(color: Colors.black),),
+                        child: Text(
+                          '${index + 1} Bhk',
+                          style: TextStyle(
+                            color: selectedBedroom == '${index + 1} Bhk' ? Colors.white : Colors.black, // Change text color based on selection
+                          ),
+                        ),
                       ),
                       selected: selectedBedroom == '${index + 1} Bhk',
+                      selectedColor: HexColor('#122636'),// Change to your desired selected color
+                    checkmarkColor: Colors.white,
                       onSelected: (bool selected) {
                         setState(() {
                           selectedBedroom = '${index + 1} Bhk';
                         });
                       },
-                    ),
+                    )
+
                   );
                 }).toList(),
               ),
@@ -296,6 +334,7 @@ class _PropertySearchScreenState extends State<SearchScreen> {
                           width: 120.sp,
                           child: Card(
                             elevation: 4,
+                            color: Colors.white,
                             child:  Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Text(
@@ -338,6 +377,7 @@ class _PropertySearchScreenState extends State<SearchScreen> {
                           width: 120.sp,
                           child: Card(
                             elevation: 4,
+                            color: Colors.white,
                             child:  Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Text(
@@ -382,6 +422,8 @@ class _PropertySearchScreenState extends State<SearchScreen> {
                       },
                       min: 2000.0,
                       max: 50000.0,
+                      activeColor: HexColor('#122636'),// Color of the active part of the slider
+                      inactiveColor: Colors.grey, // Color of the inactive part of the slider
                     ),
 
                   ],
@@ -393,14 +435,14 @@ class _PropertySearchScreenState extends State<SearchScreen> {
                 height: 50.sp,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: HexColor('#ffc107'),
+                      backgroundColor: HexColor('#122636'),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15))),
                   child: Text(
                     "Search",
                     style: GoogleFonts.poppins(
-                      textStyle: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.normal, color: Colors.black),
+                      textStyle: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.normal, color: Colors.white),
                     ),
                   ),
                   onPressed: () async {
@@ -408,10 +450,10 @@ class _PropertySearchScreenState extends State<SearchScreen> {
                     //   loginUser(context);
                     // }
 
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => Homepage()),
-                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ApartmentListing(backButton: 'back')),
+                    );
                   },
                 ),
               ),
