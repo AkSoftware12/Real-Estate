@@ -188,71 +188,71 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
 
                     ),
 
-                    Padding(
-                      padding:  EdgeInsets.all(15.sp),
-                      child: Container(
-                        width: double.infinity,
-                        height: 150.sp,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                          // Rounded corners with radius 10
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 2,
-                              blurRadius: 7,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Stack(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage(
-                                      "assets/customImages/bannerImg.png"),
-                                  fit: BoxFit.cover,
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                    10.0), // Match the parent container's rounded corners
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(16.sp),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Real Estate Solutions",
-                                    style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(
-                                          fontSize: 15.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 15.sp,
-                                  ),
-                                  Text(
-                                    "We are here to \n providing best deal \n on properties.",
-                                    style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.normal,
-                                          color: Colors.white),
-                                    ),
-                                  ),
-                                  SizedBox(height: 20.sp),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    // Padding(
+                    //   padding:  EdgeInsets.all(15.sp),
+                    //   child: Container(
+                    //     width: double.infinity,
+                    //     height: 150.sp,
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.white,
+                    //       borderRadius: BorderRadius.circular(10.0),
+                    //       // Rounded corners with radius 10
+                    //       boxShadow: [
+                    //         BoxShadow(
+                    //           color: Colors.grey.withOpacity(0.5),
+                    //           spreadRadius: 2,
+                    //           blurRadius: 7,
+                    //           offset: Offset(0, 3),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //     child: Stack(
+                    //       children: [
+                    //         Container(
+                    //           decoration: BoxDecoration(
+                    //             image: DecorationImage(
+                    //               image: AssetImage(
+                    //                   "assets/customImages/bannerImg.png"),
+                    //               fit: BoxFit.cover,
+                    //             ),
+                    //             borderRadius: BorderRadius.circular(
+                    //                 10.0), // Match the parent container's rounded corners
+                    //           ),
+                    //         ),
+                    //         Container(
+                    //           padding: EdgeInsets.all(16.sp),
+                    //           child: Column(
+                    //             crossAxisAlignment: CrossAxisAlignment.start,
+                    //             children: [
+                    //               Text(
+                    //                 "Real Estate Solutions",
+                    //                 style: GoogleFonts.poppins(
+                    //                   textStyle: TextStyle(
+                    //                       fontSize: 15.sp,
+                    //                       fontWeight: FontWeight.bold,
+                    //                       color: Colors.white),
+                    //                 ),
+                    //               ),
+                    //               SizedBox(
+                    //                 height: 15.sp,
+                    //               ),
+                    //               Text(
+                    //                 "We are here to \n providing best deal \n on properties.",
+                    //                 style: GoogleFonts.poppins(
+                    //                   textStyle: TextStyle(
+                    //                       fontSize: 12.sp,
+                    //                       fontWeight: FontWeight.normal,
+                    //                       color: Colors.white),
+                    //                 ),
+                    //               ),
+                    //               SizedBox(height: 20.sp),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -316,7 +316,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                     Spacer(),
                     GestureDetector(
                       onTap: (){
-                        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
 
                       },
                       child: Text(
@@ -473,13 +473,19 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                       ),
                     ),
                     Spacer(),
-                    Text(
-                      'View all',
-                      style: GoogleFonts.poppins(
-                        textStyle: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.normal,
-                          color: HexColor('#9ba3aa'),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+
+                      },
+                      child: Text(
+                        'View all',
+                        style: GoogleFonts.poppins(
+                          textStyle: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.normal,
+                            color: HexColor('#9ba3aa'),
+                          ),
                         ),
                       ),
                     ),
@@ -494,170 +500,176 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                   itemCount: 4, // Set the number of items
                   itemBuilder: (BuildContext context, int index) {
                     // Here you can build your list item based on the index
-                    return Container(
-                      height: 75.sp,
-                      decoration: BoxDecoration(
-                        color: HexColor('#f6f6f7'),
-                        borderRadius: BorderRadius.circular(5.0),
-                      ),
-                      margin: EdgeInsets.only(left: 5.sp,top: 5.sp,bottom: 5.sp),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                              height: double.infinity,
-                              width: 75.sp,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(5.0),
-                              ),
-                              margin: EdgeInsets.all(8.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10.0),
-                                child: Image(
-                                  image: AssetImage(
-                                      'assets/customImages/testFlatImg.jpg'),
-                                  fit: BoxFit.cover,
+                    return GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+
+                      },
+                      child: Container(
+                        height: 75.sp,
+                        decoration: BoxDecoration(
+                          color: HexColor('#f6f6f7'),
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        margin: EdgeInsets.only(left: 5.sp,top: 5.sp,bottom: 5.sp),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                                height: double.infinity,
+                                width: 75.sp,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(5.0),
                                 ),
-                              )),
-                          Padding(
-                            padding:  EdgeInsets.all(8.sp),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding:  EdgeInsets.only(left: 0.sp,),
-                                  child: Padding(
-                                    padding:  EdgeInsets.only(top: 0.sp),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Renovated Luxury Apartme',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.radioCanada(
-                                            textStyle: TextStyle(
-                                                fontSize: TextSizes.textsmall,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black),
+                                margin: EdgeInsets.all(8.0),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  child: Image(
+                                    image: AssetImage(
+                                        'assets/customImages/testFlatImg.jpg'),
+                                    fit: BoxFit.cover,
+                                  ),
+                                )),
+                            Padding(
+                              padding:  EdgeInsets.all(8.sp),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding:  EdgeInsets.only(left: 0.sp,),
+                                    child: Padding(
+                                      padding:  EdgeInsets.only(top: 0.sp),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Renovated Luxury Apartme',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.radioCanada(
+                                              textStyle: TextStyle(
+                                                  fontSize: TextSizes.textsmall,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black),
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(height: 5.sp,),
-                                        Row(
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.location_on,
-                                                  size: 11.sp,
-                                                  color: Colors.red,
+                                          SizedBox(height: 5.sp,),
+                                          Row(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.location_on,
+                                                    size: 11.sp,
+                                                    color: Colors.red,
+                                                  ),
+                                                ],
+                                              ),
+                                              Text(
+                                                '2021 San Pedro, Los Angeles 90'.length >
+                                                    20
+                                                    ? '2021 San Pedro, Los Angeles 90'
+                                                    .substring(0, 20) +
+                                                    '...'
+                                                    : '2021 San Pedro, Los Angeles 90',
+                                                maxLines: 1,
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 13.sp,
+                                                    fontWeight: FontWeight.normal,
+                                                    color: HexColor('#9ba3aa'),
+                                                  ),
                                                 ),
-                                              ],
-                                            ),
-                                            Text(
-                                              '2021 San Pedro, Los Angeles 90'.length >
-                                                  20
-                                                  ? '2021 San Pedro, Los Angeles 90'
-                                                  .substring(0, 20) +
-                                                  '...'
-                                                  : '2021 San Pedro, Los Angeles 90',
-                                              maxLines: 1,
-                                              style: GoogleFonts.poppins(
-                                                textStyle: TextStyle(
-                                                  fontSize: 13.sp,
-                                                  fontWeight: FontWeight.normal,
-                                                  color: HexColor('#9ba3aa'),
+                                              )
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '₹ ',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                      fontSize: TextSizes.textsmall,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.black),
                                                 ),
                                               ),
-                                            )
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '₹ ',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: GoogleFonts.poppins(
-                                                textStyle: TextStyle(
-                                                    fontSize: TextSizes.textsmall,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
+                                              Text(
+                                                '5000',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                      fontSize: TextSizes.textsmall,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.black),
+                                                ),
                                               ),
-                                            ),
-                                            Text(
-                                              '5000',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: GoogleFonts.poppins(
-                                                textStyle: TextStyle(
-                                                    fontSize: TextSizes.textsmall,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
+                                              Text(
+                                                ' Per Month',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                      fontSize: 14.sp,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.black),
+                                                ),
                                               ),
-                                            ),
-                                            Text(
-                                              ' Per Month',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: GoogleFonts.poppins(
-                                                textStyle: TextStyle(
-                                                    fontSize: 14.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
-                                              ),
-                                            ),
 
-                                          ],
-                                        ),
+                                            ],
+                                          ),
 
-                                      ],
-                                    ),
-                                  ),
-                                ),
-
-                              ],
-                            ),
-                          ),
-                          Container(),
-                          Container(),
-                          Container(),
-                          Container(
-                            height: 90.sp,
-                            width: 60.sp,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Spacer(),
-                                Container(
-                                  height: 20.sp,
-                                  width: 50.sp,
-                                  decoration: BoxDecoration(
-                                    color: HexColor('#122636'),
-                                    borderRadius: BorderRadius.circular(5.0),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      '1 BHK',
-                                      style: GoogleFonts.cabinCondensed(
-                                        textStyle: TextStyle(
-                                            fontSize: TextSizes.textsmall,
-                                            fontWeight: FontWeight.normal,
-                                            color: Colors.white),
+                                        ],
                                       ),
-
                                     ),
                                   ),
-                                ),
-                                SizedBox(height: 10.sp,)
 
-
-                              ],
+                                ],
+                              ),
                             ),
-                          )
+                            Container(),
+                            Container(),
+                            Container(),
+                            Container(
+                              height: 90.sp,
+                              width: 60.sp,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Spacer(),
+                                  Container(
+                                    height: 20.sp,
+                                    width: 50.sp,
+                                    decoration: BoxDecoration(
+                                      color: HexColor('#122636'),
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        '1 BHK',
+                                        style: GoogleFonts.cabinCondensed(
+                                          textStyle: TextStyle(
+                                              fontSize: TextSizes.textsmall,
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.white),
+                                        ),
 
-                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 10.sp,)
+
+
+                                ],
+                              ),
+                            )
+
+                          ],
+                        ),
                       ),
                     );
                   },
@@ -815,75 +827,81 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                       4,
                           (index) => Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          width: double.infinity,
-                          height: 100.sp,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10.0),
-                            // Rounded corners with radius 10
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 2,
-                                blurRadius: 7,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Stack(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: AssetImage(
-                                        "assets/customImages/localitiesImg.jpg"),
-                                    fit: BoxFit.cover,
+                        child: GestureDetector(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            height: 100.sp,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10.0),
+                              // Rounded corners with radius 10
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 7,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Stack(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: AssetImage(
+                                          "assets/customImages/localitiesImg.jpg"),
+                                      fit: BoxFit.cover,
+                                    ),
+                                    borderRadius: BorderRadius.circular(
+                                        10.0), // Match the parent container's rounded corners
                                   ),
-                                  borderRadius: BorderRadius.circular(
-                                      10.0), // Match the parent container's rounded corners
                                 ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.all(16.sp),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Dehradun",
-                                      style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
-                                            fontSize: 15.sp,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white),
+                                Container(
+                                  padding: EdgeInsets.all(16.sp),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Dehradun",
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                              fontSize: 15.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white),
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(
-                                      height: 10.sp,
-                                    ),
-                                    Text(
-                                      '${"₹ 5000"}${" - "}${"₹ 1000"}',
-                                      style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.normal,
-                                            color: Colors.white),
+                                      SizedBox(
+                                        height: 10.sp,
                                       ),
-                                    ),
-                                    SizedBox(height: 10.sp),
-                                    Text(
-                                      '${"30+"}${"Flats For Sale"}',
-                                      style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.normal,
-                                            color: Colors.white),
+                                      Text(
+                                        '${"₹ 5000"}${" - "}${"₹ 1000"}',
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.white),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      SizedBox(height: 10.sp),
+                                      Text(
+                                        '${"30+"}${"Flats For Sale"}',
+                                        style: GoogleFonts.poppins(
+                                          textStyle: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),

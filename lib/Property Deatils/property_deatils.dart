@@ -440,7 +440,8 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                                                 .normal, // Adjust font weight as needed
                                                             // Adjust font color as needed
                                                           ),
-                                                        ),),
+                                                        ),
+                                                      ),
                                                       SizedBox(height: 5.sp,),
                                                       Text(
                                                         "1950 sqft" ,

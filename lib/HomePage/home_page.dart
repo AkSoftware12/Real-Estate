@@ -13,6 +13,7 @@ import 'package:realestate/HomeScreen/home_screen.dart';
 import 'package:realestate/Location/location.dart';
 import 'package:realestate/LoginPage/login_page.dart';
 import 'package:realestate/NotificationScreen/notification.dart';
+import 'package:realestate/PostProperty/post_property.dart';
 import 'package:realestate/Profile%20Update/profile_update.dart';
 import 'package:realestate/Property%20Deatils/property_deatils.dart';
 import 'package:realestate/Search/search.dart';
@@ -909,10 +910,10 @@ class _HomepageState extends State<Homepage> {
                         ),
                         onTap: () {
                           Navigator.of(context).pop(); // Close the drawer
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(builder: (context) => SettingsScreen()),
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => PostProperty()),
+                          );
                         },
                       ),
                     ),
