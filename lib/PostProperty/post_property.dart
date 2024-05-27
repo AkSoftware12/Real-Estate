@@ -28,10 +28,13 @@ class _PostPropertyState extends State<PostProperty> {
   final TextEditingController _pinCodeController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
-  final _textFieldContect = TextEditingController();
-  final _textFieldwhatsappContact = TextEditingController();
+  final _ownerContactController = TextEditingController();
+  final _whatsappController = TextEditingController();
 
-
+  bool _isWater = false;
+  bool _isInvertor = false;
+  bool _isSecurity = false;
+  bool _isCarParking = false;
   String _state = '';
   String _city = '';
   late GoogleMapController mapController;
@@ -63,11 +66,14 @@ class _PostPropertyState extends State<PostProperty> {
       });
     }
   }
+  String _feedback = '';
 
 
   @override
   void initState() {
     super.initState();
+    _whatsappController.addListener(_checkPhoneNumber);
+
     _getCurrentLocation().then((_) {
       // Once the current location is obtained, update the initial camera position
       setState(() {
@@ -75,9 +81,39 @@ class _PostPropertyState extends State<PostProperty> {
       });
     });
   }
-  String? _validateTextFields() {
-    if (_textFieldContect.text == _textFieldwhatsappContact.text) {
-      return 'The contact number and whatsapp number same ';
+  @override
+  void dispose() {
+    _whatsappController.removeListener(_checkPhoneNumber);
+    _ownerContactController.dispose();
+    _whatsappController.dispose();
+    super.dispose();
+  }
+
+  void _checkPhoneNumber() {
+    String keyword = _ownerContactController.text; // Replace with the number you want to check
+    setState(() {
+      if (_whatsappController.text == keyword) {
+        // _feedback = 'Phone number matches the keyword!';
+        _feedback = 'Owner Contact and Whatsapp number same please different Number!';
+      } else {
+        _feedback = '';
+      }
+    });
+  }
+
+  String? _validatePhoneNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a phone number';
+    }
+    if (value.length != 10) {
+      return 'Phone number must be 10 digits';
+    }
+    return null;
+  }
+
+  String? _validateMatchingNumbers() {
+    if (_ownerContactController.text == _whatsappController.text) {
+      return 'Owner Contact and Whatsapp number same please different Number  ';
     }
     return null;
   }
@@ -210,12 +246,15 @@ class _PostPropertyState extends State<PostProperty> {
     'Hotel',
     'Cottage',
     'Apartment',
+    'PG',
   ];
 
   String selectedProperty = 'House';
+  String _selectedfacing = 'North';
+  String _selectedArea = 'sqft';
+
 
   Item? _selectedItem;
-  Item? _selectedfacing;
   Item? _selectedfloor;
   Item? _selectedbeds;
   Item? _selectedkitchen;
@@ -734,489 +773,351 @@ class _PostPropertyState extends State<PostProperty> {
                   ],
                 ),
               ),
-              //  3
 
-              // //  4
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: Column(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: [
-              //       Padding(
-              //         padding: const EdgeInsets.all(5.0),
-              //         child: Text.rich(
-              //           TextSpan(
-              //             text: "Pin Code",
-              //             style: GoogleFonts.radioCanada(
-              //               textStyle: TextStyle(
-              //                 color: Colors.black,
-              //                 fontSize: TextSizes.textmedium,
-              //                 // Adjust font size as needed
-              //                 fontWeight: FontWeight
-              //                     .bold, // Adjust font weight as needed
-              //               ),
-              //             ),
-              //           ),
-              //           textAlign: TextAlign
-              //               .start, // Ensure text starts at the beginning
-              //         ),
-              //       ),
-              //       Stack(
-              //         children: [
-              //           Container(
-              //             width: double.infinity,
-              //             height: 40.sp,
-              //             decoration: BoxDecoration(
-              //               color: HexColor('#122636'),
-              //               borderRadius: BorderRadius.circular(10.0),
-              //               boxShadow: [
-              //                 BoxShadow(
-              //                   color: Colors.grey.withOpacity(0.5),
-              //                   spreadRadius: 2,
-              //                   blurRadius: 7,
-              //                   offset: Offset(0, 3),
-              //                 ),
-              //               ],
-              //             ),
-              //             child: Stack(
-              //               children: [
-              //                 Positioned(
-              //                   left: 10,
-              //                   child: Container(
-              //                     width: double.infinity,
-              //                     height: 40.sp,
-              //                     decoration: BoxDecoration(
-              //                       color: Colors.white,
-              //                       borderRadius: BorderRadius.circular(10.0),
-              //                       boxShadow: [
-              //                         BoxShadow(
-              //                           color: Colors.orange.withOpacity(0.5),
-              //                           spreadRadius: 2,
-              //                           blurRadius: 7,
-              //                           offset: Offset(0, 3),
-              //                         ),
-              //                       ],
-              //                     ),
-              //                   ),
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //           Padding(
-              //             padding: const EdgeInsets.only(left: 8.0, right: 8),
-              //             child: Container(
-              //               width: double.infinity,
-              //               height: 40.sp,
-              //               decoration: BoxDecoration(
-              //                 color: Colors.white,
-              //                 borderRadius: BorderRadius.circular(10.0),
-              //                 boxShadow: [
-              //                   BoxShadow(
-              //                     color: Colors.grey.withOpacity(0.5),
-              //                     spreadRadius: 2,
-              //                     blurRadius: 7,
-              //                     offset: Offset(0, 3),
-              //                   ),
-              //                 ],
-              //               ),
-              //               child: Row(
-              //                 children: [
-              //                   Flexible(
-              //                     child: Padding(
-              //                       padding:
-              //                           EdgeInsets.symmetric(horizontal: 8.0),
-              //                       child: TextField(
-              //                         controller: _pinCodeController,
-              //                         keyboardType: TextInputType.number,
-              //                         onChanged: (value) {
-              //                           if (value.length == 6) {
-              //                             _fetchStateAndCity(value);
-              //                           }
-              //                         },
-              //                         style: GoogleFonts.poppins(
-              //                           textStyle: TextStyle(
-              //                               fontSize: TextSizes.textsmall,
-              //                               fontWeight: FontWeight.normal,
-              //                               color: Colors.black),
-              //                         ),
-              //                         decoration: InputDecoration(
-              //                           hintText: 'Enter  Pin Code',
-              //                           border: InputBorder.none,
-              //                         ),
-              //                         textInputAction: TextInputAction.next,
-              //                         // This sets the keyboard action to "Next"
-              //                         onEditingComplete: () =>
-              //                             FocusScope.of(context).nextFocus(),
-              //                       ),
-              //                     ),
-              //                   ),
-              //                 ],
-              //               ),
-              //             ),
-              //           ),
-              //         ],
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              //
-              // // 4
-              //
-              // //  5
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: Column(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: [
-              //       Padding(
-              //         padding: const EdgeInsets.all(5.0),
-              //         child: Text.rich(
-              //           TextSpan(
-              //             text: "Address",
-              //             style: GoogleFonts.radioCanada(
-              //               textStyle: TextStyle(
-              //                 color: Colors.black,
-              //                 fontSize: TextSizes.textmedium,
-              //                 // Adjust font size as needed
-              //                 fontWeight: FontWeight
-              //                     .bold, // Adjust font weight as needed
-              //               ),
-              //             ),
-              //           ),
-              //           textAlign: TextAlign
-              //               .start, // Ensure text starts at the beginning
-              //         ),
-              //       ),
-              //       Stack(
-              //         children: [
-              //           Container(
-              //             width: double.infinity,
-              //             height: 40.sp,
-              //             decoration: BoxDecoration(
-              //               color: HexColor('#122636'),
-              //               borderRadius: BorderRadius.circular(10.0),
-              //               boxShadow: [
-              //                 BoxShadow(
-              //                   color: Colors.grey.withOpacity(0.5),
-              //                   spreadRadius: 2,
-              //                   blurRadius: 7,
-              //                   offset: Offset(0, 3),
-              //                 ),
-              //               ],
-              //             ),
-              //             child: Stack(
-              //               children: [
-              //                 Positioned(
-              //                   left: 10,
-              //                   child: Container(
-              //                     width: double.infinity,
-              //                     height: 40.sp,
-              //                     decoration: BoxDecoration(
-              //                       color: Colors.white,
-              //                       borderRadius: BorderRadius.circular(10.0),
-              //                       boxShadow: [
-              //                         BoxShadow(
-              //                           color: Colors.orange.withOpacity(0.5),
-              //                           spreadRadius: 2,
-              //                           blurRadius: 7,
-              //                           offset: Offset(0, 3),
-              //                         ),
-              //                       ],
-              //                     ),
-              //                   ),
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //           Padding(
-              //             padding: const EdgeInsets.only(left: 8.0, right: 8),
-              //             child: Container(
-              //               width: double.infinity,
-              //               height: 40.sp,
-              //               decoration: BoxDecoration(
-              //                 color: Colors.white,
-              //                 borderRadius: BorderRadius.circular(10.0),
-              //                 boxShadow: [
-              //                   BoxShadow(
-              //                     color: Colors.grey.withOpacity(0.5),
-              //                     spreadRadius: 2,
-              //                     blurRadius: 7,
-              //                     offset: Offset(0, 3),
-              //                   ),
-              //                 ],
-              //               ),
-              //               child: Row(
-              //                 children: [
-              //                   Flexible(
-              //                     child: Padding(
-              //                       padding:
-              //                           EdgeInsets.symmetric(horizontal: 8.0),
-              //                       child: Text(_currentAddress,
-              //                         style: GoogleFonts.poppins(
-              //                           textStyle: TextStyle(
-              //                               fontSize: TextSizes.textsmall,
-              //                               fontWeight: FontWeight.normal,
-              //                               color: Colors.black),
-              //                         ),
-              //
-              //                       ),
-              //                     ),
-              //                   ),
-              //                 ],
-              //               ),
-              //             ),
-              //           ),
-              //         ],
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              //
-              // // 5
-              //
-              // //  6
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: Column(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: [
-              //       Padding(
-              //         padding: const EdgeInsets.all(5.0),
-              //         child: Text.rich(
-              //           TextSpan(
-              //             text: "City",
-              //             style: GoogleFonts.radioCanada(
-              //               textStyle: TextStyle(
-              //                 color: Colors.black,
-              //                 fontSize: TextSizes.textmedium,
-              //                 // Adjust font size as needed
-              //                 fontWeight: FontWeight
-              //                     .bold, // Adjust font weight as needed
-              //               ),
-              //             ),
-              //           ),
-              //           textAlign: TextAlign
-              //               .start, // Ensure text starts at the beginning
-              //         ),
-              //       ),
-              //       Stack(
-              //         children: [
-              //           Container(
-              //             width: double.infinity,
-              //             height: 40.sp,
-              //             decoration: BoxDecoration(
-              //               color: HexColor('#122636'),
-              //               borderRadius: BorderRadius.circular(10.0),
-              //               boxShadow: [
-              //                 BoxShadow(
-              //                   color: Colors.grey.withOpacity(0.5),
-              //                   spreadRadius: 2,
-              //                   blurRadius: 7,
-              //                   offset: Offset(0, 3),
-              //                 ),
-              //               ],
-              //             ),
-              //             child: Stack(
-              //               children: [
-              //                 Positioned(
-              //                   left: 10,
-              //                   child: Container(
-              //                     width: double.infinity,
-              //                     height: 40.sp,
-              //                     decoration: BoxDecoration(
-              //                       color: Colors.white,
-              //                       borderRadius: BorderRadius.circular(10.0),
-              //                       boxShadow: [
-              //                         BoxShadow(
-              //                           color: Colors.orange.withOpacity(0.5),
-              //                           spreadRadius: 2,
-              //                           blurRadius: 7,
-              //                           offset: Offset(0, 3),
-              //                         ),
-              //                       ],
-              //                     ),
-              //                   ),
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //           Padding(
-              //             padding: const EdgeInsets.only(left: 8.0, right: 8),
-              //             child: Container(
-              //               width: double.infinity,
-              //               height: 40.sp,
-              //               decoration: BoxDecoration(
-              //                 color: Colors.white,
-              //                 borderRadius: BorderRadius.circular(10.0),
-              //                 boxShadow: [
-              //                   BoxShadow(
-              //                     color: Colors.grey.withOpacity(0.5),
-              //                     spreadRadius: 2,
-              //                     blurRadius: 7,
-              //                     offset: Offset(0, 3),
-              //                   ),
-              //                 ],
-              //               ),
-              //               child: Row(
-              //                 children: [
-              //                   Flexible(
-              //                     child: Padding(
-              //                       padding:
-              //                           EdgeInsets.symmetric(horizontal: 8.0),
-              //                       child: TextField(
-              //                         readOnly: true,
-              //                         controller:
-              //                             TextEditingController(text: _city),
-              //                         style: GoogleFonts.poppins(
-              //                           textStyle: TextStyle(
-              //                               fontSize: TextSizes.textsmall,
-              //                               fontWeight: FontWeight.normal,
-              //                               color: Colors.black),
-              //                         ),
-              //                         decoration: InputDecoration(
-              //                           hintText: 'Enter  City',
-              //                           border: InputBorder.none,
-              //                         ),
-              //                         textInputAction: TextInputAction.next,
-              //                         // This sets the keyboard action to "Next"
-              //                         onEditingComplete: () =>
-              //                             FocusScope.of(context).nextFocus(),
-              //                       ),
-              //                     ),
-              //                   ),
-              //                 ],
-              //               ),
-              //             ),
-              //           ),
-              //         ],
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              // // 6
-              //
-              // //  7
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: Column(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: [
-              //       Padding(
-              //         padding: const EdgeInsets.all(5.0),
-              //         child: Text.rich(
-              //           TextSpan(
-              //             text: "State",
-              //             style: GoogleFonts.radioCanada(
-              //               textStyle: TextStyle(
-              //                 color: Colors.black,
-              //                 fontSize: TextSizes.textmedium,
-              //                 // Adjust font size as needed
-              //                 fontWeight: FontWeight
-              //                     .bold, // Adjust font weight as needed
-              //               ),
-              //             ),
-              //           ),
-              //           textAlign: TextAlign
-              //               .start, // Ensure text starts at the beginning
-              //         ),
-              //       ),
-              //       Stack(
-              //         children: [
-              //           Container(
-              //             width: double.infinity,
-              //             height: 40.sp,
-              //             decoration: BoxDecoration(
-              //               color: HexColor('#122636'),
-              //               borderRadius: BorderRadius.circular(10.0),
-              //               boxShadow: [
-              //                 BoxShadow(
-              //                   color: Colors.grey.withOpacity(0.5),
-              //                   spreadRadius: 2,
-              //                   blurRadius: 7,
-              //                   offset: Offset(0, 3),
-              //                 ),
-              //               ],
-              //             ),
-              //             child: Stack(
-              //               children: [
-              //                 Positioned(
-              //                   left: 10,
-              //                   child: Container(
-              //                     width: double.infinity,
-              //                     height: 40.sp,
-              //                     decoration: BoxDecoration(
-              //                       color: Colors.white,
-              //                       borderRadius: BorderRadius.circular(10.0),
-              //                       boxShadow: [
-              //                         BoxShadow(
-              //                           color: Colors.orange.withOpacity(0.5),
-              //                           spreadRadius: 2,
-              //                           blurRadius: 7,
-              //                           offset: Offset(0, 3),
-              //                         ),
-              //                       ],
-              //                     ),
-              //                   ),
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //           Padding(
-              //             padding: const EdgeInsets.only(left: 8.0, right: 8),
-              //             child: Container(
-              //               width: double.infinity,
-              //               height: 40.sp,
-              //               decoration: BoxDecoration(
-              //                 color: Colors.white,
-              //                 borderRadius: BorderRadius.circular(10.0),
-              //                 boxShadow: [
-              //                   BoxShadow(
-              //                     color: Colors.grey.withOpacity(0.5),
-              //                     spreadRadius: 2,
-              //                     blurRadius: 7,
-              //                     offset: Offset(0, 3),
-              //                   ),
-              //                 ],
-              //               ),
-              //               child: Row(
-              //                 children: [
-              //                   Flexible(
-              //                     child: Padding(
-              //                       padding:
-              //                           EdgeInsets.symmetric(horizontal: 8.0),
-              //                       child: TextField(
-              //                         readOnly: true,
-              //                         controller:
-              //                             TextEditingController(text: _state),
-              //                         style: GoogleFonts.poppins(
-              //                           textStyle: TextStyle(
-              //                               fontSize: TextSizes.textsmall,
-              //                               fontWeight: FontWeight.normal,
-              //                               color: Colors.black),
-              //                         ),
-              //                         decoration: InputDecoration(
-              //                           hintText: 'Enter  State',
-              //                           border: InputBorder.none,
-              //                         ),
-              //                         textInputAction: TextInputAction.next,
-              //                         // This sets the keyboard action to "Next"
-              //                         onEditingComplete: () =>
-              //                             FocusScope.of(context).nextFocus(),
-              //                       ),
-              //                     ),
-              //                   ),
-              //                 ],
-              //               ),
-              //             ),
-              //           ),
-              //         ],
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              // // 7
 
-              //  8
+
+
+
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Text.rich(
+                        TextSpan(
+                          text: "Price",
+                          style: GoogleFonts.radioCanada(
+                            textStyle: TextStyle(
+                              color: Colors.black,
+                              fontSize: TextSizes.textmedium,
+                              // Adjust font size as needed
+                              fontWeight: FontWeight
+                                  .bold, // Adjust font weight as needed
+                            ),
+                          ),
+                        ),
+                        textAlign: TextAlign
+                            .start, // Ensure text starts at the beginning
+                      ),
+                    ),
+                    Stack(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 40.sp,
+                          decoration: BoxDecoration(
+                            color: HexColor('#122636'),
+                            borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 7,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                left: 10,
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 40.sp,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.orange.withOpacity(0.5),
+                                        spreadRadius: 2,
+                                        blurRadius: 7,
+                                        offset: Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0, right: 8),
+                          child: Container(
+                            width: double.infinity,
+                            height: 40.sp,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 7,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.currency_rupee_sharp,size: 20.sp,color: Colors.black,),
+                                Flexible(
+                                  child: Padding(
+                                    padding:
+                                    EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: TextField(
+                                      keyboardType: TextInputType.number,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: TextSizes.textsmall,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.black),
+                                      ),
+                                      decoration: InputDecoration(
+                                        hintText: 'Enter price',
+                                        border: InputBorder.none,
+                                      ),
+                                      textInputAction: TextInputAction.next,
+                                      // This sets the keyboard action to "Next"
+                                      onEditingComplete: () =>
+                                          FocusScope.of(context).nextFocus(),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Text.rich(
+                        TextSpan(
+                          text: "Security Price",
+                          style: GoogleFonts.radioCanada(
+                            textStyle: TextStyle(
+                              color: Colors.black,
+                              fontSize: TextSizes.textmedium,
+                              // Adjust font size as needed
+                              fontWeight: FontWeight
+                                  .bold, // Adjust font weight as needed
+                            ),
+                          ),
+                        ),
+                        textAlign: TextAlign
+                            .start, // Ensure text starts at the beginning
+                      ),
+                    ),
+                    Stack(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 40.sp,
+                          decoration: BoxDecoration(
+                            color: HexColor('#122636'),
+                            borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 7,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                left: 10,
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 40.sp,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.orange.withOpacity(0.5),
+                                        spreadRadius: 2,
+                                        blurRadius: 7,
+                                        offset: Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0, right: 8),
+                          child: Container(
+                            width: double.infinity,
+                            height: 40.sp,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 7,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.currency_rupee_sharp,size: 20.sp,color: Colors.black,),
+                                Flexible(
+                                  child: Padding(
+                                    padding:
+                                    EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: TextField(
+                                      keyboardType: TextInputType.number,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: TextSizes.textsmall,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.black),
+                                      ),
+                                      decoration: InputDecoration(
+                                        hintText: 'Enter price',
+                                        border: InputBorder.none,
+                                      ),
+                                      textInputAction: TextInputAction.next,
+                                      // This sets the keyboard action to "Next"
+                                      onEditingComplete: () =>
+                                          FocusScope.of(context).nextFocus(),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Text.rich(
+                    TextSpan(
+                      text: "Buildup Area",
+                      style: GoogleFonts.radioCanada(
+                        textStyle: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16.sp, // Adjust font size as needed
+                          fontWeight: FontWeight.bold, // Adjust font weight as needed
+                        ),
+                      ),
+                    ),
+                    textAlign: TextAlign.start, // Ensure text starts at the beginning
+                  ),
+                ),
+                Stack(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: 40.sp,
+                      decoration: BoxDecoration(
+                        color: HexColor('#122636'),
+                        borderRadius: BorderRadius.circular(10.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 2,
+                            blurRadius: 7,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 8),
+                      child: Container(
+                        width: double.infinity,
+                        height: 40.sp,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 2,
+                              blurRadius: 7,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                child: TextField(
+                                  keyboardType: TextInputType.number,
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: 'Enter area',
+                                    border: InputBorder.none,
+                                  ),
+                                  textInputAction: TextInputAction.next,
+                                  onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                                ),
+                              ),
+                            ),
+                            DropdownButton<String>(
+                              value: _selectedArea,
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  _selectedArea = newValue!;
+                                });
+                              },
+                              items: <String>['sqft', 'ft', 'yard']
+                                  .map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value,style: TextStyle(color: Colors.black),),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -1457,6 +1358,7 @@ class _PostPropertyState extends State<PostProperty> {
               Form(
                 key: _formKey,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -1546,11 +1448,12 @@ class _PostPropertyState extends State<PostProperty> {
                                           child: Padding(
                                             padding:
                                             EdgeInsets.symmetric(horizontal: 8.0),
-                                            child: TextField(
+                                            child: TextFormField(
+                                              controller: _ownerContactController,
                                               keyboardType: TextInputType.phone,
                                               style: GoogleFonts.poppins(
                                                 textStyle: TextStyle(
-                                                    fontSize: TextSizes.textsmall,
+                                                    fontSize: 14,
                                                     fontWeight: FontWeight.normal,
                                                     color: Colors.black),
                                               ),
@@ -1559,9 +1462,7 @@ class _PostPropertyState extends State<PostProperty> {
                                                 border: InputBorder.none,
                                               ),
                                               textInputAction: TextInputAction.next,
-                                              // This sets the keyboard action to "Next"
-                                              onEditingComplete: () =>
-                                                  FocusScope.of(context).nextFocus(),
+                                              validator: _validatePhoneNumber,
                                             ),
                                           ),
                                         ),
@@ -1663,11 +1564,12 @@ class _PostPropertyState extends State<PostProperty> {
                                           child: Padding(
                                             padding:
                                             EdgeInsets.symmetric(horizontal: 8.0),
-                                            child: TextField(
+                                            child: TextFormField(
+                                              controller: _whatsappController,
                                               keyboardType: TextInputType.phone,
                                               style: GoogleFonts.poppins(
                                                 textStyle: TextStyle(
-                                                    fontSize: TextSizes.textsmall,
+                                                    fontSize: 14,
                                                     fontWeight: FontWeight.normal,
                                                     color: Colors.black),
                                               ),
@@ -1676,9 +1578,13 @@ class _PostPropertyState extends State<PostProperty> {
                                                 border: InputBorder.none,
                                               ),
                                               textInputAction: TextInputAction.next,
-                                              // This sets the keyboard action to "Next"
-                                              onEditingComplete: () =>
-                                                  FocusScope.of(context).nextFocus(),
+                                              validator: (value) {
+                                                final validationMessage = _validatePhoneNumber(value);
+                                                if (validationMessage != null) {
+                                                  return validationMessage;
+                                                }
+                                                return _validateMatchingNumbers();
+                                              },
                                             ),
                                           ),
                                         ),
@@ -1689,6 +1595,19 @@ class _PostPropertyState extends State<PostProperty> {
                               ],
                             ),
                           ],
+                        ),
+                      ),
+
+                      if(_feedback.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          _feedback,
+                          style: TextStyle(
+                            fontSize: TextSizes.textsmall,
+                            color: _feedback.contains('matches') ? Colors.red : Colors.red,
+
+                          ),
                         ),
                       ),
                     ],
@@ -1712,15 +1631,12 @@ class _PostPropertyState extends State<PostProperty> {
                           style: GoogleFonts.radioCanada(
                             textStyle: TextStyle(
                               color: Colors.black,
-                              fontSize: TextSizes.textmedium,
-                              // Adjust font size as needed
-                              fontWeight: FontWeight
-                                  .bold, // Adjust font weight as needed
+                              fontSize: 16.sp, // Adjust font size as needed
+                              fontWeight: FontWeight.bold, // Adjust font weight as needed
                             ),
                           ),
                         ),
-                        textAlign: TextAlign
-                            .start, // Ensure text starts at the beginning
+                        textAlign: TextAlign.start, // Ensure text starts at the beginning
                       ),
                     ),
                     Stack(
@@ -1737,29 +1653,6 @@ class _PostPropertyState extends State<PostProperty> {
                                 spreadRadius: 2,
                                 blurRadius: 7,
                                 offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                left: 10,
-                                child: Container(
-                                  width: double.infinity,
-                                  height: 40.sp,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.orange.withOpacity(0.5),
-                                        spreadRadius: 2,
-                                        blurRadius: 7,
-                                        offset: Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                ),
                               ),
                             ],
                           ),
@@ -1781,32 +1674,29 @@ class _PostPropertyState extends State<PostProperty> {
                                 ),
                               ],
                             ),
-                            child: Row(
-                              children: [
-                                Flexible(
-                                  child: Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: TextField(
-                                      keyboardType: TextInputType.name,
-                                      style: GoogleFonts.poppins(
-                                        textStyle: TextStyle(
-                                            fontSize: TextSizes.textsmall,
-                                            fontWeight: FontWeight.normal,
-                                            color: Colors.black),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child:DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: _selectedfacing,
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      _selectedfacing = newValue!;
+                                    });
+                                  },
+                                  items: <String>['North', 'West', 'South', 'East', 'North-East', 'North-West', 'South-East', 'South-West']
+                                      .map<DropdownMenuItem<String>>((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(
+                                        value,
+                                        style: TextStyle(color: Colors.black),
                                       ),
-                                      decoration: InputDecoration(
-                                        hintText: 'Enter Facing',
-                                        border: InputBorder.none,
-                                      ),
-                                      textInputAction: TextInputAction.next,
-                                      // This sets the keyboard action to "Next"
-                                      onEditingComplete: () =>
-                                          FocusScope.of(context).nextFocus(),
-                                    ),
-                                  ),
+                                    );
+                                  }).toList(),
+                                  isExpanded: true,
                                 ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
@@ -2499,6 +2389,95 @@ class _PostPropertyState extends State<PostProperty> {
                 ),
               ),
 
+          Padding(
+            padding:  EdgeInsets.only(top: 18.sp),
+            child: Padding(
+              padding:  EdgeInsets.only(left: 8.sp,right: 8.sp),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Checkbox(
+                        value: _isWater,
+                        activeColor: Colors.orange,
+
+                        onChanged: (bool? value) {
+                          setState(() {
+                            _isWater = value ?? false;
+                          });
+                        },
+                      ),
+                      Text('Water 24/7',style: TextStyle(color: Colors.black),)
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Checkbox(
+                        value: _isInvertor,
+                        activeColor: Colors.orange,
+
+                        onChanged: (bool? value) {
+                          setState(() {
+                            _isInvertor = value ?? false;
+                          });
+                        },
+                      ),
+                      Text('Invertor',style: TextStyle(color: Colors.black),)
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Checkbox(
+                        value: _isSecurity,
+                        activeColor: Colors.orange,
+
+                        onChanged: (bool? value) {
+                          setState(() {
+                            _isSecurity = value ?? false;
+                          });
+                        },
+                      ),
+                      Text('Security',style: TextStyle(color: Colors.black),)
+                    ],
+                  ),
+
+
+                ],
+              ),
+            ),
+          ),
+              Padding(
+                padding:  EdgeInsets.only(left: 8.sp,right: 8.sp),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Checkbox(
+                          value: _isCarParking,
+                          activeColor: Colors.orange,
+
+                          onChanged: (bool? value) {
+                            setState(() {
+                              _isCarParking = value ?? false;
+                            });
+                          },
+                        ),
+                        Text('Car Parking',style: TextStyle(color: Colors.black),)
+                      ],
+                    ),
+
+                  ],
+                ),
+              ),
+
+
 
               SizedBox(height: 50.sp),
               SizedBox(
@@ -2516,15 +2495,10 @@ class _PostPropertyState extends State<PostProperty> {
                       textStyle: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.normal, color: Colors.black),
                     ),
                   ),
-                  onPressed: () async {
-                    // if (formKey.currentState!.validate()) {
-                    //   loginUser(context);
-                    // }
-
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => LoginPage()),
-                    // );
+                  onPressed: () {
+                    if (_formKey.currentState?.validate() ?? false) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Validation successful')));
+                    }
                   },
                 ),
               ),
