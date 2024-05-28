@@ -1,19 +1,147 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/ForgotPassword/forgot_password.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
 import 'package:realestate/HomePage/home_page.dart';
 import 'package:realestate/RegisterPage/register_page.dart';
 import 'package:realestate/Utils/color.dart';
+import 'package:realestate/baseurl/baseurl.dart';
+import 'package:http/http.dart' as http;
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
+
   final _focusNode = FocusNode();
 
+  final TextEditingController emailController = TextEditingController();
+
+  final TextEditingController passwordController = TextEditingController();
+
+  String email = "";
+
+  String password = "";
+
+  bool _isLoading = false;
+
+  Future<void> loginUser(BuildContext context) async {
+
+    try {
+      final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+      String? deviceToken = await _firebaseMessaging.getToken();
+      print('Device id: $deviceToken');
+
+      if (formKey.currentState!.validate()) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(
+                    color: Colors.orangeAccent,
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+        setState(() {
+          _isLoading = true;
+        });
+        String apiUrl = login; // Replace with your API endpoint
+
+        final response = await http.post(
+          Uri.parse(apiUrl),
+          body: {
+            'email': emailController.text,
+            'password': passwordController.text,
+            'device_id': deviceToken, // Pass device token to your API
+          },
+        );
+        setState(() {
+          _isLoading = false; // Set loading state to false after registration completes
+        });
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> responseData = json.decode(response.body);
+
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          final String token = responseData['token'];
+          final String name = responseData['data']['name'];
+          // Save token using shared_preferences
+          await prefs.setString('token', token);
+          await prefs.setString('name', name);
+
+          if (email == 'admin@gmail.com') {
+            prefs.setBool('admin', true);
+            await prefs.setString('adminButton', 'adminButton');
+
+            // Navigator.pushReplacement(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => AdminPage(),
+            //   ),
+            // );
+          } else {
+            prefs.setBool('isLoggedIn', true);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Homepage(),
+              ),
+            );
+          }
+
+
+
+          print('User registered successfully!');
+          print(token);
+          print(response.body);
+        } else {
+
+          Navigator.pop(context);
+          // Registration failed
+          // You may handle the error response here, e.g., show an error message
+          print('Registration failed!');
+          Fluttertoast.showToast(
+            msg: response.body,
+            toastLength: Toast.LENGTH_LONG, // Duration for which the toast should be displayed
+            gravity: ToastGravity.BOTTOM, // Toast gravity
+            timeInSecForIosWeb: 1, // Time in seconds for iOS and web
+            backgroundColor: Colors.black.withOpacity(0.8), // Background color of the toast
+            textColor: Colors.white, // Text color of the toast
+            fontSize: 16.0, // Font size of the toast message
+          );
+        }
+      }
+    } catch (e) {
+      emailController.clear();
+      passwordController.clear();
+      Navigator.pop(context); // Close the progress dialog
+      // Handle errors appropriately
+      print('Error during login: $e');
+      // Show a snackbar or display an error message
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to log in. Please try again.'),
+      ))
+      ;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,9 +278,8 @@ class LoginPage extends StatelessWidget {
                                 Flexible(
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: TextField(
-
-
+                                    child: TextFormField(
+                                      controller: emailController,
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.normal, color: Colors.black),
                                       ),
@@ -161,6 +288,20 @@ class LoginPage extends StatelessWidget {
                                         border: InputBorder.none,
                                         prefixIcon: Icon(Icons.email, color: Colors.black),
                                       ),
+                                      onChanged: (val) {
+                                        setState(() {
+                                          email = val;
+                                        });
+                                      },
+
+                                      // check tha validation
+                                      validator: (val) {
+                                        return RegExp(
+                                            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                            .hasMatch(val!)
+                                            ? null
+                                            : "Please enter a valid email";
+                                      },
                                         textInputAction: TextInputAction.next, // This sets the keyboard action to "Next"
                                         onEditingComplete: () => FocusScope.of(context).nextFocus(),
                                     ),
@@ -259,7 +400,9 @@ class LoginPage extends StatelessWidget {
                                 Expanded(
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: TextField(
+                                    child: TextFormField(
+                                      controller: passwordController,
+
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.normal, color: Colors.black),
                                       ),
@@ -267,6 +410,18 @@ class LoginPage extends StatelessWidget {
                                         hintText: 'Enter your password',
                                         border: InputBorder.none,
                                       ),
+                                      validator: (val) {
+                                        if (val!.length < 6) {
+                                          return "Password must be at least 6 characters";
+                                        } else {
+                                          return null;
+                                        }
+                                      },
+                                      onChanged: (val) {
+                                        setState(() {
+                                          password = val;
+                                        });
+                                      },
                                     ),
                                   ),
                                 ),
@@ -310,14 +465,12 @@ class LoginPage extends StatelessWidget {
                           ),
                         ),
                         onPressed: () async {
-                          // if (formKey.currentState!.validate()) {
-                          //   loginUser(context);
-                          // }
+                          loginUser(context);
 
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => Homepage()),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(builder: (context) => Homepage()),
+                          // );
                         },
                       ),
                     ),

@@ -75,7 +75,7 @@ class _RegisterPageState extends State<RegisterPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => Homepage(),
+              builder: (context) => LoginPage(),
             ),
           );
           print('User registered successfully!');
