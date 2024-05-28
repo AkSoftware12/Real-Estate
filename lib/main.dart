@@ -1,9 +1,12 @@
 
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'HomePage/home_page.dart';
 import 'LoginPage/login_page.dart';
@@ -20,17 +23,17 @@ Future main() async {
   HttpOverrides.global = MyHttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Platform.isAndroid ? await Firebase.initializeApp(
-  //   options: kIsWeb || Platform.isAndroid
-  //       ? const FirebaseOptions(
-  //     apiKey: 'AIzaSyDJhqaxbFUoEouW04cpYcdaMCdQgdtVb98',
-  //     appId: '1:279206444482:android:8b2ca8492f538f17ab6a5b',
-  //     messagingSenderId: '279206444482',
-  //     projectId: 'aph-9bada',
-  //     storageBucket: "aph-9bada.appspot.com",
-  //   )
-  //       : null,
-  // ) : await Firebase.initializeApp();
+  Platform.isAndroid ? await Firebase.initializeApp(
+    options: kIsWeb || Platform.isAndroid
+        ? const FirebaseOptions(
+      apiKey: 'AIzaSyDJhqaxbFUoEouW04cpYcdaMCdQgdtVb98',
+      appId: '1:279206444482:android:8b2ca8492f538f17ab6a5b',
+      messagingSenderId: '279206444482',
+      projectId: 'aph-9bada',
+      storageBucket: "aph-9bada.appspot.com",
+    )
+        : null,
+  ) : await Firebase.initializeApp();
   // FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
   // await PushNotificationService().setupInteractedMessage();
   //

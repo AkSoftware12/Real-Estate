@@ -20,6 +20,9 @@ import 'package:realestate/Search/search.dart';
 import 'package:realestate/Utils/color.dart';
 import 'package:realestate/Utils/string.dart';
 import 'package:realestate/Utils/textSize.dart';
+import 'package:realestate/baseurl/baseurl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 
 
@@ -78,6 +81,72 @@ class _HomepageState extends State<Homepage> {
       _selectedIndex = index;
     });
   }
+
+
+  Future<void> logoutApi(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent user from dismissing dialog
+      builder: (BuildContext context) {
+        return Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(
+                color: Colors.orangeAccent,
+              ),
+              // SizedBox(width: 16.0),
+              // Text("Logging in..."),
+            ],
+          ),
+        );
+      },
+    );
+
+    try {
+      // Replace 'your_token_here' with your actual token
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
+      final Uri uri = Uri.parse(logout);
+      final Map<String, String> headers = {'Authorization': 'Bearer $token'};
+
+      final response = await http.post(uri, headers: headers);
+
+      Navigator.pop(context); // Close the progress dialog
+
+      if (response.statusCode == 200) {
+
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.remove('isLoggedIn',);
+
+
+
+
+        // If the server returns a 200 OK response, parse the data
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return LoginPage();
+            },
+          ),
+        );
+      } else {
+        // If the server did not return a 200 OK response,
+        // throw an exception.
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      Navigator.pop(context); // Close the progress dialog
+      // Handle errors appropriately
+      print('Error during logout: $e');
+      // Show a snackbar or display an error message
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to log out. Please try again.'),
+      ));
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -1321,11 +1390,8 @@ class _HomepageState extends State<Homepage> {
                           ),
                         ),
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginPage()),);
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(builder: (context) => SettingsScreen()),
-                          // );
+                          logoutApi(context);
+
                         },
                       ),
                     ),
