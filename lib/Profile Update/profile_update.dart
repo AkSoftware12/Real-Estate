@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,12 +10,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:realestate/Account/account.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
 import 'package:realestate/Utils/color_constants.dart';
 import 'package:realestate/Utils/textSize.dart';
+import 'package:realestate/baseurl/baseurl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileUpdatePage extends StatefulWidget {
-  const ProfileUpdatePage({super.key});
+  final VoidCallback onReturn;
+
+  const ProfileUpdatePage({super.key, required this.onReturn});
 
   @override
   State<ProfileUpdatePage> createState() => _AccountPageState();
@@ -25,6 +32,7 @@ class _AccountPageState extends State<ProfileUpdatePage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController bioController = TextEditingController();
+  Timer? timer;
 
 
   File? file;
@@ -44,6 +52,149 @@ class _AccountPageState extends State<ProfileUpdatePage> {
   bool _loading = false;
   bool _isLoading = false;
   final formKey = GlobalKey<FormState>();
+  @override
+  void initState() {
+    super.initState();
+    fetchProfileData();
+
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel(); // Cancel timer to prevent memory leaks
+    super.dispose();
+  }
+  Future<void> fetchProfileData() async {
+
+
+
+    setState(() {
+      _isLoading = true;
+    });
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString(
+      'token',
+    );
+    final Uri uri =
+    Uri.parse(getProfile);
+    final Map<String, String> headers = {'Authorization': 'Bearer $token'};
+    final response = await http.get(uri, headers: headers);
+
+    setState(() {
+      _isLoading =
+      false; // Set loading state to false after registration completes
+    });
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+
+      setState(() {
+        nameController.text = jsonData['user']['name'];
+        emailController.text = jsonData['user']['email'];
+        phoneController.text = jsonData['user']['contact'].toString();
+        photoUrl = jsonData['user']['picture_data'];
+      });
+
+    } else {
+      throw Exception('Failed to load profile data');
+    }
+  }
+
+
+  Future<void> _updateProfile(File? file) async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(
+                color: Colors.orangeAccent,
+              ),
+              // SizedBox(width: 16.0),
+              // Text("Logging in..."),
+            ],
+          ),
+        );
+      },
+    );
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Get user input data
+    String name = nameController.text;
+    String email = emailController.text;
+    String phoneNumber = phoneController.text;
+    String bio = bioController.text;
+
+    // Get the selected image file
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString('token');
+
+    // Your API endpoint for updating profile
+    String apiUrl = updateProfile;
+
+    try {
+      // Create multipart request for image upload
+      var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+      // Add other fields to the request
+      request.fields.addAll({
+        'name': name,
+        'email': email,
+        'contact': phoneNumber,
+        'bio': bio,
+      });
+
+      // Add authorization header
+      request.headers['Authorization'] = 'Bearer $token';
+      if (file != null) {
+        request.files.add(await http.MultipartFile.fromPath('image', file.path));
+      }
+
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+
+
+
+
+      // // Send the request
+      // var response = await request.send();
+
+      if (response.statusCode == 200) {
+
+        widget.onReturn();
+        Navigator.pop(context);
+
+
+        Fluttertoast.showToast(
+          msg: "Update Profile successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 22.0,
+        );
+
+
+        // You can navigate to another screen or show a success message
+      } else {
+        // Error occurred while updating profile
+        print('Failed to update profile. Error: ${response.statusCode}');
+        // Handle error accordingly, show error message, etc.
+      }
+    } catch (e) {
+      print('Exception occurred: $e');
+      // Handle exception, show error message, etc.
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -234,7 +385,7 @@ class _AccountPageState extends State<ProfileUpdatePage> {
                                           child: Padding(
                                             padding: EdgeInsets.only(right: 10.0),
                                             child: new TextField(
-                                              controller: bioController,
+                                              controller: nameController,
                                               decoration: const InputDecoration(
                                                   border: InputBorder.none,
                                                   hintText: "Admin"),
@@ -284,7 +435,7 @@ class _AccountPageState extends State<ProfileUpdatePage> {
                                 ),
                                 title: Padding(
                                     padding: EdgeInsets.only(
-                                        left: 0.0, right: 25.0, top: 0),
+                                        left: 0.0, right: 5.0, top: 0),
                                     child: new Row(
                                       mainAxisSize: MainAxisSize.max,
                                       mainAxisAlignment: MainAxisAlignment.start,
@@ -293,7 +444,7 @@ class _AccountPageState extends State<ProfileUpdatePage> {
                                           child: Padding(
                                             padding: EdgeInsets.only(right: 10.0),
                                             child: new TextField(
-                                              controller: bioController,
+                                              controller: emailController,
                                               decoration: const InputDecoration(
                                                   border: InputBorder.none,
                                                   hintText: "admin@gmail.com"),
@@ -353,7 +504,7 @@ class _AccountPageState extends State<ProfileUpdatePage> {
                                             padding: EdgeInsets.only(right: 10.0),
                                             child: new TextField(
                                               keyboardType: TextInputType.phone,
-                                              controller: bioController,
+                                              controller: phoneController,
                                               decoration: const InputDecoration(
                                                   border: InputBorder.none,
                                                   hintText: "+91 234567890"),
@@ -572,6 +723,7 @@ class _AccountPageState extends State<ProfileUpdatePage> {
                       SizedBox(width: 10.sp,),
                       GestureDetector(
                           onTap: (){
+                            widget.onReturn();
                             Navigator.pop(context);
                           },
                           child: Container(
@@ -664,9 +816,7 @@ class _AccountPageState extends State<ProfileUpdatePage> {
               padding: const EdgeInsets.all(0.0),
               child: GestureDetector(
                 onTap: (){
-                  Timer(Duration(seconds: 2), () {
-                    Navigator.pop(context);
-                  });
+                  _updateProfile(file);
                 },
                 child: Row(
                   children: [

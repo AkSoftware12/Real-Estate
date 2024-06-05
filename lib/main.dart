@@ -26,31 +26,18 @@ Future main() async {
   Platform.isAndroid ? await Firebase.initializeApp(
     options: kIsWeb || Platform.isAndroid
         ? const FirebaseOptions(
-      apiKey: 'AIzaSyDJhqaxbFUoEouW04cpYcdaMCdQgdtVb98',
-      appId: '1:279206444482:android:8b2ca8492f538f17ab6a5b',
-      messagingSenderId: '279206444482',
-      projectId: 'aph-9bada',
-      storageBucket: "aph-9bada.appspot.com",
+      apiKey: 'AIzaSyBUA91qYmdwiieMNmOXBV5OBoOnuaEZYAk',
+      appId: '1:964552601387:android:0d8ff94e209ddcb7dedf6e',
+      messagingSenderId: '964552601387',
+      projectId: 'real-estate-565af',
+      storageBucket: "real-estate-565af.appspot.com",
     )
         : null,
   ) : await Firebase.initializeApp();
-  // FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
-  // await PushNotificationService().setupInteractedMessage();
-  //
-  //
-  //
-  //
-  //
-  // await FirebaseAppCheck.instance.activate();
-  // ZegoUIKit().initLog().then((value) async {
-  //   runApp(const MyApp());
-  //
-  //   RemoteMessage? initialMessage =
-  //   await FirebaseMessaging.instance.getInitialMessage();
-  //   if (initialMessage != null) {
-  //     // App received a notification when it was killed
-  //   }
-  // });
+
+
+
+
 
   runApp(const MyApp());
 }

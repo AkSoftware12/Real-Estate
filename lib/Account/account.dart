@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
 import 'package:realestate/Profile%20Update/profile_update.dart';
 import 'package:realestate/Utils/textSize.dart';
+import 'package:realestate/baseurl/baseurl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class AccountPage extends StatefulWidget {
   final String backButton;
@@ -17,6 +22,60 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+
+  bool _isLoading = false;
+  String nickname = '';
+  String photoUrl = '';
+  String userEmail = '';
+  String contact = '';
+  String address = '';
+  String cityState = '';
+  String pin = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProfileData();
+
+  }
+  void _refresh() {
+    setState(() {
+      fetchProfileData();
+    });
+  }
+  Future<void> fetchProfileData() async {
+
+    setState(() {
+      _isLoading = true;
+    });
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString(
+      'token',
+    );
+    final Uri uri =
+    Uri.parse(getProfile);
+    final Map<String, String> headers = {'Authorization': 'Bearer $token'};
+    final response = await http.get(uri, headers: headers);
+
+    setState(() {
+      _isLoading =
+      false; // Set loading state to false after registration completes
+    });
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+
+      setState(() {
+        nickname= jsonData['user']['name'];
+        userEmail = jsonData['user']['email'];
+        contact = jsonData['user']['contact'].toString();
+        // address = jsonData['user']['bio'];
+        photoUrl = jsonData['user']['picture_data'];
+      });
+    } else {
+      throw Exception('Failed to load profile data');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,9 +143,25 @@ class _AccountPageState extends State<AccountPage> {
                                       ),
                                     ],
                                   ),
-                                  child: Image.network(
-                                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDdGRceHjr8BE1lgHrlDW4gtK5moPuhAxF-g&s',
-                                    fit: BoxFit.fill,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    child: Image.network(
+                                      photoUrl.toString(),
+
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        // Return a default image widget here
+                                        return Container(
+                                          color: Colors.grey,
+                                          // Placeholder color
+                                          // You can customize the default image as needed
+                                          child: Icon(
+                                            Icons.image,
+                                            color: Colors.white,
+                                          ),
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
                               ),
@@ -96,7 +171,7 @@ class _AccountPageState extends State<AccountPage> {
                             width: 10.sp,
                           ),
                           Text(
-                            "James Charley!",
+                            '${nickname}',
                             style: GoogleFonts.radioCanada(
                               // Replace with your desired Google Font
                               textStyle: TextStyle(
@@ -116,7 +191,7 @@ class _AccountPageState extends State<AccountPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) {
-                                    return ProfileUpdatePage();
+                                    return ProfileUpdatePage(onReturn: _refresh);
                                   },
                                 ),
                               );
@@ -198,7 +273,7 @@ class _AccountPageState extends State<AccountPage> {
                       ),
                       Text.rich(
                         TextSpan(
-                          text: "ravikantsaini@gmail.com",
+                          text: "${userEmail}",
                           style: GoogleFonts.radioCanada(
                             textStyle: TextStyle(
                               color: Colors.grey,
@@ -271,7 +346,7 @@ class _AccountPageState extends State<AccountPage> {
                       ),
                       Text.rich(
                         TextSpan(
-                          text: "+919988776655",
+                          text: "${contact}",
                           style: GoogleFonts.radioCanada(
                             textStyle: TextStyle(
                               color: Colors.grey,

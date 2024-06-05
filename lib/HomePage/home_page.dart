@@ -2,15 +2,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:realestate/Account/account.dart';
 import 'package:realestate/All%20Property/all_property.dart';
+import 'package:realestate/ApiModel/latlng.dart';
 import 'package:realestate/ChangePassword/change_password.dart';
 import 'package:realestate/ForgotPassword/forgot_password.dart';
 import 'package:realestate/HomePage/home_page.dart';
 import 'package:realestate/HomeScreen/home_screen.dart';
 import 'package:realestate/Location/location.dart';
+import 'package:realestate/LocationPage/location_page.dart';
 import 'package:realestate/LoginPage/login_page.dart';
 import 'package:realestate/NotificationScreen/notification.dart';
 import 'package:realestate/PostProperty/post_property.dart';
@@ -73,6 +77,18 @@ class _HomepageState extends State<Homepage> {
   bool _isExpandedNewProject  = false;
   bool _isExpandedLocation  = false;
   bool _isExpandedAccount = false;
+
+  late GoogleMapController mapController;
+  LatLng _currentPosition = LatLng(0, 0);
+  String _currentAddress = "Searching...";
+  String? cityName = 'Searching...';
+
+
+  double userLat = 0.0;
+  double userLng = 0.0;
+  var lat = 30.3253;
+  var lng = 78.0413;
+
   final List<String> items = ['1 Bhk', '2 Bhk', '3 Bhk', '4 Bhk', '5 Bhk'];
   final List<String> project = ['Flats', 'Houses', 'Villas',];
   final List<String> location = ['Dehradun', 'Chandigarh', 'Delhi','Mumbai'];
@@ -147,9 +163,180 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _getLocation(context);
+
+    _getCurrentLocation().then((_) {
+      // Once the current location is obtained, update the initial camera position
+      setState(() {
+        _updateCameraPosition(_currentPosition);
+      });
+    });
+  }
+
+  void _updateCameraPosition(LatLng position) {
+    mapController.moveCamera(
+      CameraUpdate.newLatLngZoom(
+        position,
+        15.0, // Adjust the zoom level as needed
+      ),
+    );
+  }
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    setState(() {
+      _currentPosition = LatLng(position.latitude, position.longitude);
+      // _addMarker(_currentPosition);
+    });
+
+    _getAddressFromLatLng(_currentPosition);
+  }
+
+  Future<void> _getAddressFromLatLng(LatLng position) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          position.latitude, position.longitude);
+
+      Placemark place = placemarks[0];
+
+      setState(() {
+        _currentAddress ="${place.subLocality}, ${place.locality} ";
+
+        // "${place.street},${place.subLocality}, ${place.locality}, ${place.administrativeArea},${place.postalCode}, ${place.country}";
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+
+  void _getLocation(context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always) {
+      bool isLocationServiceEnableds =
+      await Geolocator.isLocationServiceEnabled();
+      if (isLocationServiceEnableds) {
+        Position position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.best);
+
+        double lt = position.latitude;
+        String latstring = lt.toStringAsFixed(8); // '2.35'
+        double lats = double.parse(latstring);
+
+        double ln = position.longitude;
+        String lanstring = ln.toStringAsFixed(8); // '2.35'
+        double lngs = double.parse(lanstring);
+
+        prefs.setString("lat", latstring);
+        prefs.setString("lng", lanstring);
+
+        setState(() {
+          lat = lats;
+          lng = lngs;
+        });
+
+        //double lat = position.latitude;
+        //double lat = 29.006057;
+        //double lng = position.longitude;
+        //double lng = 77.027535;
+
+        List<Placemark> placemarks = await placemarkFromCoordinates(lats, lngs);
+        setState(() {
+          cityName = (placemarks.elementAt(0).subLocality.toString()) +
+              " ( " +
+              (placemarks.elementAt(0).locality.toString()) +
+              " )".toUpperCase();
+
+          prefs.setString("addr", cityName.toString());
+        });
+      } else {
+        await Geolocator.openLocationSettings().then((value) {
+          if (value) {
+            _getLocation(context);
+          } else {
+            // Toast.show('Location permission is required!', context,
+            //     duration: Toast.LENGTH_SHORT);
+          }
+        }).catchError((e) {
+          // Toast.show('Location permission is required!', context,
+          //     duration: Toast.LENGTH_SHORT);
+        });
+      }
+    } else if (permission == LocationPermission.denied) {
+      LocationPermission permissiond = await Geolocator.requestPermission();
+      if (permissiond == LocationPermission.whileInUse ||
+          permissiond == LocationPermission.always) {
+        _getLocation(context);
+      } else {
+        // Toast.show('Location permission is required!', context,
+        //     duration: Toast.LENGTH_SHORT);
+      }
+    } else if (permission == LocationPermission.deniedForever) {
+      // await Geolocator.openAppSettings().then((value) {
+      //   _getLocation(context);
+      // }).catchError((e) {
+      //   // Toast.show('Location permission is required!', context,
+      //   //     duration: Toast.LENGTH_SHORT);
+      // });
+    }
+  }
+  void getBackResult(latss, lngss) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    double lats = double.parse(prefs.getString('lat')!);
+    double lngs = double.parse(prefs.getString('lng')!);
+    //
+    // prefs.setString("lat", latss.toStringAsFixed(8));
+    // prefs.setString("lng", lngss.toStringAsFixed(8));
+
+    print("LATLONG" + lat.toString() + lng.toString());
+    List<Placemark> placemarks = await placemarkFromCoordinates(lats, lngs);
+
+    print("LATLONG" + placemarks.toString());
+
+    setState(() {
+      cityName = (placemarks.elementAt(0).subLocality.toString()) +
+          " ( " +
+          (placemarks.elementAt(0).locality.toString()) +
+          " )".toUpperCase();
+      prefs.setString("addr", cityName.toString());
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       key: _scaffoldKey,
 
@@ -184,53 +371,48 @@ class _HomepageState extends State<Homepage> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10.0),
-              child: SizedBox(
-                width: 30.sp,
-                height: 30.sp,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=> AccountPage(backButton: 'back',)),);
 
+
+            Padding(
+              padding: EdgeInsets.only(top: 0.0, left: 10.sp),
+              child: Container(
+                // width: screenWidth * 0.7, // 80% of screen width
+
+                child: GestureDetector(
+                  onTap: () async {
+                    print("SENDINGLATLNG  " + lat.toString() + lng.toString());
+                    BackLatLng back = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => LocationPage(lat, lng)));
+
+                    getBackResult(back.lat, back.lng);
                   },
-                  child: Container(
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
-                          child: Image.network(
-                            'photoUrl',
-                            fit: BoxFit.cover,
-                            width: 30.sp,
-                            height: 30.sp,
-                            errorBuilder: (context, object, stackTrace) {
-                              return ClipRRect(
-                                borderRadius: BorderRadius.circular(30),
-                                // Half of width/height for perfect circle
-                                child: Image.asset(
-                                  "assets/images/icons/profile.png",
-                                  fit: BoxFit.cover,
-                                  width: 30.sp,
-                                  height: 30.sp,
-                                ),
-                              );
-                            },
-                          ))),
+                  child: Text.rich(TextSpan(
+                    text: '${''}${cityName}',
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                          fontSize: TextSizes.textsmall,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black),
+                    ),
+                  )),
                 ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 0.0, left: 10.sp),
-              child: Text.rich(TextSpan(
-                text: 'James Charley',
-                style: GoogleFonts.poppins(
-                  textStyle: TextStyle(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.grey),
-                ),
-              )),
-            ),
             Spacer(),
+            IconButton(
+              icon: Icon(
+                Icons.location_searching,
+                color: Colors.black,
+                size: 25.sp,
+              ),
+              onPressed: () {
+                // _getCurrentPosition();
+                // _getCurrentLocation();
+                _getLocation(context);
+              },
+            ),
             GestureDetector(
               onTap: (){
                 Navigator.push(context, MaterialPageRoute(builder: (context)=> NotificationScreen()),);
@@ -491,7 +673,7 @@ class _HomepageState extends State<Homepage> {
                                     children: [
                                       GestureDetector(
                                         onTap: (){
-                                          Navigator.push(context, MaterialPageRoute(builder: (context)=> ProfileUpdatePage()),);
+                                          Navigator.push(context, MaterialPageRoute(builder: (context)=> ProfileUpdatePage(onReturn: () {  },)),);
 
                                         },
                                         child: Padding(
