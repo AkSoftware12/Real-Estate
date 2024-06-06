@@ -84,9 +84,12 @@ class _LoginPageState extends State<LoginPage> {
 
           final SharedPreferences prefs = await SharedPreferences.getInstance();
           final String token = responseData['token'];
-          final String name = responseData['data']['name'];
+          final String Userid = responseData['data']['id'].toString();
+          final String User = responseData['data'].toString();
           // Save token using shared_preferences
           await prefs.setString('token', token);
+          await prefs.setString('id', Userid);
+          await prefs.setString('data', User);
 
           prefs.setBool('isLoggedIn', true);
           Navigator.pushReplacement(

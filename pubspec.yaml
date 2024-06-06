@@ -57,6 +57,8 @@ dependencies:
   flutter_svg: ^2.0.9
   google_maps_webservice: ^0.0.19
   flutter_google_places_hoc081098: ^1.2.0
+  cached_network_image: ^3.2.2
+
 
 
 

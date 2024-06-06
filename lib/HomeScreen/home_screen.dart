@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,7 +15,8 @@ import 'package:realestate/Property%20Deatils/property_deatils.dart';
 import 'package:realestate/PropertyList/residential_property_list.dart';
 import 'package:realestate/Utils/color.dart';
 import 'package:realestate/Utils/textSize.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:realestate/baseurl/baseurl.dart';
 import '../Model/property_type.dart';
 
 
@@ -126,9 +129,17 @@ class _HomeSectionState extends State<HomeScreen> with SingleTickerProviderState
 }
 
 
-class CommercialScreen extends StatelessWidget {
-  final List<String> items = ['1 Bhk', '2 Bhk', '3 Bhk', '4 Bhk', '5 Bhk'];
+class CommercialScreen extends StatefulWidget {
 
+  CommercialScreen({super.key});
+
+  @override
+  State<CommercialScreen> createState() => _CommercialScreenState();
+}
+
+class _CommercialScreenState extends State<CommercialScreen> {
+  bool isLoading = true;
+  List<dynamic> subcategory = [];
   List<PropertyTypeModel> property = [
     PropertyTypeModel(
         imageUrl: 'assets/customImages/workplace.png', text: 'Office Space'),
@@ -140,7 +151,28 @@ class CommercialScreen extends StatelessWidget {
         imageUrl: 'assets/customImages/package.png', text: 'Other Commercial'),
   ];
 
-  CommercialScreen({super.key});
+
+  @override
+  void initState() {
+    super.initState();
+    CommercialCategory();
+  }
+
+  Future<void> CommercialCategory() async {
+    final response = await http.get(Uri.parse('${category}${'1'}'));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['subcategory'];
+      setState(() {
+        subcategory = data;
+        isLoading = false;
+      });
+    } else {
+      // Handle error
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
 
   @override
@@ -288,7 +320,7 @@ class CommercialScreen extends StatelessWidget {
                 child: SizedBox(
                   height: 230.sp,
                   child: GridView.builder(
-                    itemCount: property.length,
+                    itemCount: subcategory.length,
                     physics: NeverScrollableScrollPhysics(),
 
                     // Example count, replace with your actual count
@@ -321,7 +353,7 @@ class CommercialScreen extends StatelessWidget {
                                     property[index].imageUrl, fit: BoxFit.fill,)),
                               SizedBox(height: 8.0),
                               Text(
-                                property[index].text,
+                                subcategory[index]['name'],
                                 // Replace this with your text
                                 style: GoogleFonts.poppins(
                                   textStyle: TextStyle(

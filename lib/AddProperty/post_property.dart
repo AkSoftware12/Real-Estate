@@ -10,8 +10,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
+import 'package:realestate/HomePage/home_page.dart';
 import 'package:realestate/Utils/textSize.dart';
 import 'dart:io';
+
+import 'package:realestate/baseurl/baseurl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Item {
   String item;
   String value;
@@ -25,16 +30,43 @@ class PostProperty extends StatefulWidget {
 }
 
 class _PostPropertyState extends State<PostProperty> {
-  final TextEditingController _pinCodeController = TextEditingController();
+  final TextEditingController propertyNameController = TextEditingController();
+  final TextEditingController propertyPriceController = TextEditingController();
+  final TextEditingController propertySecurityPriceController =
+      TextEditingController();
+  final TextEditingController propertyAreaController = TextEditingController();
+  final TextEditingController propertyLandmarkController =
+      TextEditingController();
+  final TextEditingController propertyOwnerNameController =
+      TextEditingController();
+  final TextEditingController propertyOwnerContactController =
+      TextEditingController();
+  final TextEditingController propertyOwnerWhatsappContactController =
+      TextEditingController();
+  final TextEditingController propertyFloorController = TextEditingController();
+  final TextEditingController propertyBedroomsController =
+      TextEditingController();
+  final TextEditingController propertyKitchenController =
+      TextEditingController();
+  final TextEditingController propertyBathroomController =
+      TextEditingController();
+  final TextEditingController propertyMessageController =
+      TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
   final _ownerContactController = TextEditingController();
   final _whatsappController = TextEditingController();
+  File? file;
 
   bool _isWater = false;
   bool _isInvertor = false;
   bool _isSecurity = false;
   bool _isCarParking = false;
+  int? parkingValue;
+  int? waterValue;
+  int? invertorValue;
+  int? securityValue;
+
   String _state = '';
   String _city = '';
   late GoogleMapController mapController;
@@ -42,36 +74,27 @@ class _PostPropertyState extends State<PostProperty> {
   String _currentAddress = "Searching...";
   bool _isCameraMoving = false;
   Set<Marker> _markers = {};
-  Future<void> _fetchStateAndCity(String pinCode) async {
-    final response = await http
-        .get(Uri.parse('https://api.postalpincode.in/pincode/$pinCode'));
 
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      if (data != null && data.isNotEmpty && data[0]['Status'] == 'Success') {
-        setState(() {
-          _state = data[0]['PostOffice'][0]['State'];
-          _city = data[0]['PostOffice'][0]['District'];
-        });
-      } else {
-        setState(() {
-          _state = 'Invalid PIN';
-          _city = 'Invalid PIN';
-        });
-      }
-    } else {
-      setState(() {
-        _state = 'Error';
-        _city = 'Error';
-      });
-    }
-  }
+
   String _feedback = '';
-
+  String selectedCategory = '2';
+  String subCategory = '2';
+  String? id = '';
+  String? UserDetails;
+  String? state = '';
+  String? address = '';
+  String? city = '';
+  String? pin = '';
+  double? lng = 0.0;
+  double? lat = 0.0;
 
   @override
   void initState() {
     super.initState();
+    ResidentialCategory();
+    Userdata();
+    print(id);
+
     _whatsappController.addListener(_checkPhoneNumber);
 
     _getCurrentLocation().then((_) {
@@ -81,6 +104,13 @@ class _PostPropertyState extends State<PostProperty> {
       });
     });
   }
+
+  Future<void> Userdata() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    id = prefs.getString('id');
+    UserDetails = prefs.getString('data');
+  }
+
   @override
   void dispose() {
     _whatsappController.removeListener(_checkPhoneNumber);
@@ -90,11 +120,13 @@ class _PostPropertyState extends State<PostProperty> {
   }
 
   void _checkPhoneNumber() {
-    String keyword = _ownerContactController.text; // Replace with the number you want to check
+    String keyword = _ownerContactController
+        .text; // Replace with the number you want to check
     setState(() {
       if (_whatsappController.text == keyword) {
         // _feedback = 'Phone number matches the keyword!';
-        _feedback = 'Owner Contact and Whatsapp number same please different Number!';
+        _feedback =
+            'Owner Contact and Whatsapp number same please different Number!';
       } else {
         _feedback = '';
       }
@@ -156,6 +188,9 @@ class _PostPropertyState extends State<PostProperty> {
     setState(() {
       _currentPosition = LatLng(position.latitude, position.longitude);
       _addMarker(_currentPosition);
+
+      lat = position.latitude;
+      lng = position.longitude;
     });
 
     _getAddressFromLatLng(_currentPosition);
@@ -163,13 +198,21 @@ class _PostPropertyState extends State<PostProperty> {
 
   Future<void> _getAddressFromLatLng(LatLng position) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-          position.latitude, position.longitude);
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
 
       Placemark place = placemarks[0];
 
       setState(() {
-        _currentAddress =              "${place.name}, ${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea} ${place.postalCode}, ${place.country}";
+        _currentAddress = "${place.name}, ${place.street}, "
+            "${place.subLocality}, ${place.locality},"
+            " ${place.administrativeArea} ${place.postalCode},"
+            " ${place.country}";
+
+        state = "${place.administrativeArea}";
+        city = "${place.locality}";
+        pin = "${place.postalCode}";
+        address = "${place.name}, ${place.street},${place.subLocality},";
 
         // "${place.street},${place.subLocality}, ${place.locality}, ${place.administrativeArea},${place.postalCode}, ${place.country}";
       });
@@ -183,8 +226,6 @@ class _PostPropertyState extends State<PostProperty> {
   }
 
   void _onCameraMove(CameraPosition position) {
-
-
     setState(() {
       _isCameraMoving = true;
       _currentPosition = position.target;
@@ -234,79 +275,161 @@ class _PostPropertyState extends State<PostProperty> {
 
   void _handleToggleButtonPro(int index) {
     setState(() {
-      for (int i = 0; i < _isSelectedPro.length; i++) {
-        _isSelectedPro[i] = i == index;
+      for (int buttonIndex = 0;
+          buttonIndex < _isSelectedPro.length;
+          buttonIndex++) {
+        if (buttonIndex == index) {
+          _isSelectedPro[buttonIndex] = true;
+          // Perform your action based on the selected button
+          if (index == 0) {
+            selectedCategory = ('2');
+          } else if (index == 1) {
+            selectedCategory = ('1');
+          }
+        } else {
+          _isSelectedPro[buttonIndex] = false;
+        }
       }
     });
   }
 
-  final List<String> propertyOptions = [
-    'House',
-    'Villa',
-    'Hotel',
-    'Cottage',
-    'Apartment',
-    'PG',
-  ];
+  int? selectedPropertyId;
 
-  String selectedProperty = 'House';
   String _selectedfacing = 'North';
   String _selectedArea = 'sqft';
 
+  bool isFirstSelection = true;
+  bool _isLoading = false;
+  bool isLoading = true;
+  List<dynamic> subcategory = [];
+  int selectedPropertyIndex = 0;
 
-  Item? _selectedItem;
-  Item? _selectedfloor;
-  Item? _selectedbeds;
-  Item? _selectedkitchen;
-  Item? _selectedbathroom;
-  Item? _selectedcarParking;
+  Future<void> ResidentialCategory() async {
+    final response = await http.get(Uri.parse('${category}${'2'}'));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['subcategory'];
+      setState(() {
+        subcategory = data;
+        isLoading = false;
+      });
+    } else {
+      // Handle error
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
-  // Define the items for the dropdown list
-  List<Item> _items = [
-    Item('Residential', '1'),
-    Item('Commercial', '0'),
-  ];
-  List<Item> facing = [
-    Item('North', '1'),
-    Item('West', '2'),
-    Item('South', '3'),
-    Item('East', '4'),
-  ];
-  List<Item> beds = [
-    Item('1', '1'),
-    Item('2', '2'),
-    Item('3', '3'),
-    Item('4', '4'),
-  ];
-  List<Item> kitchen = [
-    Item('1', '1'),
-    Item('2', '2'),
-    Item('3', '3'),
-    Item('4', '4'),
-  ];
-  List<Item> bathroom = [
-    Item('1', '1'),
-    Item('2', '2'),
-    Item('3', '3'),
-    Item('4', '4'),
-  ];
-  List<Item> carParking = [
-    Item('1', '1'),
-    Item('2', '2'),
-    Item('3', '3'),
-    Item('4', '4'),
-  ];
-  List<Item> floor = [
-    Item('1', '1'),
-    Item('2', '2'),
-    Item('3', '3'),
-    Item('5', '4'),
-    Item('6', '4'),
-    Item('7', '4'),
-    Item('8', '4'),
-    Item('9', '4'),
-    Item('10', '4'),
-  ];
+  Future<void> addPost(List<XFile>? imageFiles) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(
+                color: Colors.orangeAccent,
+              ),
+              // SizedBox(width: 16.0),
+              // Text("Logging in..."),
+            ],
+          ),
+        );
+      },
+    );
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final propertyName = propertyNameController.text;
+    final propertyPrice = propertyPriceController.text;
+    final propertySecurityPrice = propertySecurityPriceController.text;
+    final propertyArea = '${propertyAreaController.text} ${_selectedArea}';
+    final propertyLandmark = propertyLandmarkController.text;
+    final propertyOwnerName = propertyOwnerNameController.text;
+    final propertyOwnerContact = _ownerContactController.text;
+    final propertyOwnerWhatsappContact = _whatsappController.text;
+    final propertyFloor = propertyFloorController.text;
+    final propertyBedrooms = propertyBedroomsController.text;
+    final propertyKitchen = propertyKitchenController.text;
+    final propertyBathroom = propertyBathroomController.text;
+    final propertyMessage = propertyMessageController.text;
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString('token');
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(addProperty),
+    );
+
+    // Add token to request headers
+    request.headers['Authorization'] = 'Bearer $token';
+
+    request.fields['category_id'] = selectedCategory;
+    request.fields['subcategory_id'] = subCategory;
+    // request.fields['user_id'] = id!;
+    request.fields['property_name'] = propertyName;
+    request.fields['property_price'] = propertyPrice;
+    request.fields['property_address'] = address!;
+    request.fields['property_district'] = city!;
+    request.fields['property_state'] = state!;
+    request.fields['property_pin'] = pin!;
+    request.fields['property_long'] = lng.toString();
+    request.fields['property_lat'] = lat.toString();
+    request.fields['property_landmark'] = propertyLandmark;
+    request.fields['property_facing'] = _selectedfacing;
+    request.fields['owner_name'] = propertyOwnerName;
+    request.fields['owner_contact'] = propertyOwnerContact;
+    request.fields['owner_whatsapp'] = propertyOwnerWhatsappContact;
+    request.fields['bulidup_area'] = propertyArea;
+    request.fields['floor'] = propertyFloor;
+    request.fields['security_amt'] = propertySecurityPrice;
+    request.fields['society'] = '';
+    request.fields['no_of_beds'] = propertyBedrooms;
+    request.fields['no_of_kitchen'] = propertyKitchen;
+    request.fields['no_of_bathroom'] = propertyBathroom;
+    request.fields['property_description'] = propertyMessage;
+    request.fields['buyRentStatus'] = '0';
+    request.fields['furniture_status'] = '0';
+    request.fields['availability_status'] = '0';
+    request.fields['car_parking'] = parkingValue.toString();
+    request.fields['water'] = waterValue.toString();
+    request.fields['invertor'] = invertorValue.toString();
+    request.fields['security'] = securityValue.toString();
+
+    // Add multiple images to the request
+    for (var file in imageFiles!) {
+      if (file != null) {
+        request.files
+            .add(await http.MultipartFile.fromPath('images[]', file.path));
+      }
+    }
+
+    var streamedResponse = await request.send();
+    var response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode == 201) {
+      print("Post added successfully");
+    } else {
+      print("Failed to add post: ${response.statusCode}");
+      print("Response body: ${response.body}");
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Homepage(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -438,13 +561,25 @@ class _PostPropertyState extends State<PostProperty> {
                         ],
                       ),
                     ),
-                    // Padding(
-                    //   padding: const EdgeInsets.all(16.0),
-                    //   child: Text('Selected option: ${_isSelected[0] ? "Buy" : _isSelected[1] ? "Rent" : "PG"}'),
-                    // ),
                   ],
                 ),
               ),
+
+              Padding(
+                padding: const EdgeInsets.all(0.0),
+                child: Text(
+                  'Selected option: ${selectedCategory}',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(0.0),
+                child: Text(
+                  'Selected option: ${lat} ${lng}',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+
               //  1
 
               // 2
@@ -471,31 +606,34 @@ class _PostPropertyState extends State<PostProperty> {
               Wrap(
                 spacing: 10.0,
                 children:
-                    List<Widget>.generate(propertyOptions.length, (int index) {
+                    List<Widget>.generate(subcategory.length, (int index) {
                   return SizedBox(
-                    height: 50.sp,
+                    height: 50.0,
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8.0),
                       child: ChoiceChip(
                         label: Padding(
                           padding: const EdgeInsets.all(0.0),
                           child: Text(
-                            propertyOptions[index],
+                            subcategory[index]['name'],
                             style: TextStyle(
-                              color: selectedProperty == propertyOptions[index]
+                              color: selectedPropertyIndex == index
                                   ? Colors.white
                                   : Colors
                                       .black, // Change text color based on selection
                             ),
                           ),
                         ),
-                        selected: selectedProperty == propertyOptions[index],
+                        selected: selectedPropertyIndex == index,
                         selectedColor: HexColor('#122636'),
                         // Change to your desired selected color
                         checkmarkColor: Colors.white,
                         onSelected: (bool selected) {
                           setState(() {
-                            selectedProperty = propertyOptions[index];
+                            selectedPropertyId = selected
+                                ? subcategory[index]['id']
+                                : subcategory[0]['id'];
+                            selectedPropertyIndex = selected ? index : -1;
                           });
                         },
                       ),
@@ -503,10 +641,7 @@ class _PostPropertyState extends State<PostProperty> {
                   );
                 }).toList(),
               ),
-
               // 2
-
-
 
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -532,27 +667,27 @@ class _PostPropertyState extends State<PostProperty> {
                             .start, // Ensure text starts at the beginning
                       ),
                     ),
-
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
                           Container(
                             decoration: BoxDecoration(
-                                color:  Colors.white,
-                                borderRadius: BorderRadius.circular(30.sp)
-
-                            ),
-
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(30.sp)),
                             child: Padding(
                               padding: const EdgeInsets.all(14.0),
-                              child: Icon(Icons.location_on,color: Colors.black,size: 20.sp,),
+                              child: Icon(
+                                Icons.location_on,
+                                color: Colors.black,
+                                size: 20.sp,
+                              ),
                             ),
                           ),
                           Padding(
-                            padding:  EdgeInsets.only(left: 5.sp,bottom: 15.sp,top: 5.sp),
+                            padding: EdgeInsets.only(
+                                left: 5.sp, bottom: 15.sp, top: 5.sp),
                             child: Container(
                               width: screenWidth * 0.7, // 80% of screen width
                               child: Text(
@@ -569,9 +704,6 @@ class _PostPropertyState extends State<PostProperty> {
                               ),
                             ),
                           )
-
-
-
                         ],
                       ),
                     ),
@@ -635,7 +767,7 @@ class _PostPropertyState extends State<PostProperty> {
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child:  GoogleMap(
+                              child: GoogleMap(
                                 onMapCreated: _onMapCreated,
                                 initialCameraPosition: CameraPosition(
                                   target: _currentPosition,
@@ -655,7 +787,6 @@ class _PostPropertyState extends State<PostProperty> {
                   ],
                 ),
               ),
-
 
 //  3
               Padding(
@@ -742,11 +873,12 @@ class _PostPropertyState extends State<PostProperty> {
                             ),
                             child: Row(
                               children: [
-                                Flexible(
+                                Expanded(
                                   child: Padding(
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 8.0),
                                     child: TextField(
+                                      controller: propertyNameController,
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(
                                             fontSize: TextSizes.textsmall,
@@ -773,10 +905,6 @@ class _PostPropertyState extends State<PostProperty> {
                   ],
                 ),
               ),
-
-
-
-
 
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -862,12 +990,17 @@ class _PostPropertyState extends State<PostProperty> {
                             ),
                             child: Row(
                               children: [
-                                Icon(Icons.currency_rupee_sharp,size: 20.sp,color: Colors.black,),
+                                Icon(
+                                  Icons.currency_rupee_sharp,
+                                  size: 20.sp,
+                                  color: Colors.black,
+                                ),
                                 Flexible(
                                   child: Padding(
                                     padding:
-                                    EdgeInsets.symmetric(horizontal: 8.0),
+                                        EdgeInsets.symmetric(horizontal: 8.0),
                                     child: TextField(
+                                      controller: propertyPriceController,
                                       keyboardType: TextInputType.number,
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(
@@ -980,12 +1113,18 @@ class _PostPropertyState extends State<PostProperty> {
                             ),
                             child: Row(
                               children: [
-                                Icon(Icons.currency_rupee_sharp,size: 20.sp,color: Colors.black,),
+                                Icon(
+                                  Icons.currency_rupee_sharp,
+                                  size: 20.sp,
+                                  color: Colors.black,
+                                ),
                                 Flexible(
                                   child: Padding(
                                     padding:
-                                    EdgeInsets.symmetric(horizontal: 8.0),
+                                        EdgeInsets.symmetric(horizontal: 8.0),
                                     child: TextField(
+                                      controller:
+                                          propertySecurityPriceController,
                                       keyboardType: TextInputType.number,
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(
@@ -1014,109 +1153,118 @@ class _PostPropertyState extends State<PostProperty> {
                 ),
               ),
 
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Text.rich(
-                    TextSpan(
-                      text: "Buildup Area",
-                      style: GoogleFonts.radioCanada(
-                        textStyle: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16.sp, // Adjust font size as needed
-                          fontWeight: FontWeight.bold, // Adjust font weight as needed
-                        ),
-                      ),
-                    ),
-                    textAlign: TextAlign.start, // Ensure text starts at the beginning
-                  ),
-                ),
-                Stack(
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: double.infinity,
-                      height: 40.sp,
-                      decoration: BoxDecoration(
-                        color: HexColor('#122636'),
-                        borderRadius: BorderRadius.circular(10.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 7,
-                            offset: Offset(0, 3),
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Text.rich(
+                        TextSpan(
+                          text: "Buildup Area",
+                          style: GoogleFonts.radioCanada(
+                            textStyle: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16.sp, // Adjust font size as needed
+                              fontWeight: FontWeight
+                                  .bold, // Adjust font weight as needed
+                            ),
                           ),
-                        ],
+                        ),
+                        textAlign: TextAlign
+                            .start, // Ensure text starts at the beginning
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0, right: 8),
-                      child: Container(
-                        width: double.infinity,
-                        height: 40.sp,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 2,
-                              blurRadius: 7,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
+                    Stack(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 40.sp,
+                          decoration: BoxDecoration(
+                            color: HexColor('#122636'),
+                            borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 7,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
                         ),
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                child: TextField(
-                                  keyboardType: TextInputType.number,
-                                  style: GoogleFonts.poppins(
-                                    textStyle: TextStyle(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.normal,
-                                      color: Colors.black,
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0, right: 8),
+                          child: Container(
+                            width: double.infinity,
+                            height: 40.sp,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 7,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Flexible(
+                                  child: Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: TextField(
+                                      controller: propertyAreaController,
+                                      keyboardType: TextInputType.number,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      decoration: InputDecoration(
+                                        hintText: 'Enter area',
+                                        border: InputBorder.none,
+                                      ),
+                                      textInputAction: TextInputAction.next,
+                                      onEditingComplete: () =>
+                                          FocusScope.of(context).nextFocus(),
                                     ),
                                   ),
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter area',
-                                    border: InputBorder.none,
-                                  ),
-                                  textInputAction: TextInputAction.next,
-                                  onEditingComplete: () => FocusScope.of(context).nextFocus(),
                                 ),
-                              ),
+                                DropdownButton<String>(
+                                  value: _selectedArea,
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      _selectedArea = newValue!;
+                                    });
+                                  },
+                                  items: <String>['sqft', 'ft', 'yard']
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(
+                                        value,
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ],
                             ),
-                            DropdownButton<String>(
-                              value: _selectedArea,
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  _selectedArea = newValue!;
-                                });
-                              },
-                              items: <String>['sqft', 'ft', 'yard']
-                                  .map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value,style: TextStyle(color: Colors.black),),
-                                );
-                              }).toList(),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
+              ),
 
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -1207,6 +1355,8 @@ class _PostPropertyState extends State<PostProperty> {
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 8.0),
                                     child: TextField(
+                                      controller: propertyLandmarkController,
+
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(
                                             fontSize: TextSizes.textsmall,
@@ -1325,6 +1475,8 @@ class _PostPropertyState extends State<PostProperty> {
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 8.0),
                                     child: TextField(
+                                      controller: propertyOwnerNameController,
+
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(
                                             fontSize: TextSizes.textsmall,
@@ -1357,40 +1509,84 @@ class _PostPropertyState extends State<PostProperty> {
 
               Form(
                 key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Text.rich(
-                                TextSpan(
-                                  text: "Owner Contact",
-                                  style: GoogleFonts.radioCanada(
-                                    textStyle: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: TextSizes.textmedium,
-                                      // Adjust font size as needed
-                                      fontWeight: FontWeight
-                                          .bold, // Adjust font weight as needed
-                                    ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Text.rich(
+                              TextSpan(
+                                text: "Owner Contact",
+                                style: GoogleFonts.radioCanada(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: TextSizes.textmedium,
+                                    // Adjust font size as needed
+                                    fontWeight: FontWeight
+                                        .bold, // Adjust font weight as needed
                                   ),
                                 ),
-                                textAlign: TextAlign
-                                    .start, // Ensure text starts at the beginning
                               ),
+                              textAlign: TextAlign
+                                  .start, // Ensure text starts at the beginning
                             ),
-                            Stack(
-                              children: [
-                                Container(
+                          ),
+                          Stack(
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                height: 40.sp,
+                                decoration: BoxDecoration(
+                                  color: HexColor('#122636'),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 2,
+                                      blurRadius: 7,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Positioned(
+                                      left: 10,
+                                      child: Container(
+                                        width: double.infinity,
+                                        height: 40.sp,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.orange
+                                                  .withOpacity(0.5),
+                                              spreadRadius: 2,
+                                              blurRadius: 7,
+                                              offset: Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 8.0, right: 8),
+                                child: Container(
                                   width: double.infinity,
                                   height: 40.sp,
                                   decoration: BoxDecoration(
-                                    color: HexColor('#122636'),
+                                    color: Colors.white,
                                     borderRadius: BorderRadius.circular(10.0),
                                     boxShadow: [
                                       BoxShadow(
@@ -1401,112 +1597,116 @@ class _PostPropertyState extends State<PostProperty> {
                                       ),
                                     ],
                                   ),
-                                  child: Stack(
+                                  child: Row(
                                     children: [
-                                      Positioned(
-                                        left: 10,
-                                        child: Container(
-                                          width: double.infinity,
-                                          height: 40.sp,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(10.0),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.orange.withOpacity(0.5),
-                                                spreadRadius: 2,
-                                                blurRadius: 7,
-                                                offset: Offset(0, 3),
-                                              ),
-                                            ],
+                                      Flexible(
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: TextFormField(
+                                            controller: _ownerContactController,
+                                            keyboardType: TextInputType.phone,
+                                            style: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.black),
+                                            ),
+                                            decoration: InputDecoration(
+                                              hintText:
+                                                  'Enter Owner Contact Number',
+                                              border: InputBorder.none,
+                                            ),
+                                            textInputAction:
+                                                TextInputAction.next,
+                                            validator: _validatePhoneNumber,
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0, right: 8),
-                                  child: Container(
-                                    width: double.infinity,
-                                    height: 40.sp,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(10.0),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.5),
-                                          spreadRadius: 2,
-                                          blurRadius: 7,
-                                          offset: Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Flexible(
-                                          child: Padding(
-                                            padding:
-                                            EdgeInsets.symmetric(horizontal: 8.0),
-                                            child: TextFormField(
-                                              controller: _ownerContactController,
-                                              keyboardType: TextInputType.phone,
-                                              style: GoogleFonts.poppins(
-                                                textStyle: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.normal,
-                                                    color: Colors.black),
-                                              ),
-                                              decoration: InputDecoration(
-                                                hintText: 'Enter Owner Contact Number',
-                                                border: InputBorder.none,
-                                              ),
-                                              textInputAction: TextInputAction.next,
-                                              validator: _validatePhoneNumber,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Text.rich(
-                                TextSpan(
-                                  text: "Whatsapp",
-                                  style: GoogleFonts.radioCanada(
-                                    textStyle: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: TextSizes.textmedium,
-                                      // Adjust font size as needed
-                                      fontWeight: FontWeight
-                                          .bold, // Adjust font weight as needed
-                                    ),
-                                  ),
-                                ),
-                                textAlign: TextAlign
-                                    .start, // Ensure text starts at the beginning
                               ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Text.rich(
+                              TextSpan(
+                                text: "Whatsapp",
+                                style: GoogleFonts.radioCanada(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: TextSizes.textmedium,
+                                    // Adjust font size as needed
+                                    fontWeight: FontWeight
+                                        .bold, // Adjust font weight as needed
+                                  ),
+                                ),
+                              ),
+                              textAlign: TextAlign
+                                  .start, // Ensure text starts at the beginning
                             ),
-                            Stack(
-                              children: [
-                                Container(
+                          ),
+                          Stack(
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                height: 40.sp,
+                                decoration: BoxDecoration(
+                                  color: HexColor('#122636'),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 2,
+                                      blurRadius: 7,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Positioned(
+                                      left: 10,
+                                      child: Container(
+                                        width: double.infinity,
+                                        height: 40.sp,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.orange
+                                                  .withOpacity(0.5),
+                                              spreadRadius: 2,
+                                              blurRadius: 7,
+                                              offset: Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 8.0, right: 8),
+                                child: Container(
                                   width: double.infinity,
                                   height: 40.sp,
                                   decoration: BoxDecoration(
-                                    color: HexColor('#122636'),
+                                    color: Colors.white,
                                     borderRadius: BorderRadius.circular(10.0),
                                     boxShadow: [
                                       BoxShadow(
@@ -1517,102 +1717,62 @@ class _PostPropertyState extends State<PostProperty> {
                                       ),
                                     ],
                                   ),
-                                  child: Stack(
+                                  child: Row(
                                     children: [
-                                      Positioned(
-                                        left: 10,
-                                        child: Container(
-                                          width: double.infinity,
-                                          height: 40.sp,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(10.0),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.orange.withOpacity(0.5),
-                                                spreadRadius: 2,
-                                                blurRadius: 7,
-                                                offset: Offset(0, 3),
-                                              ),
-                                            ],
+                                      Flexible(
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: TextFormField(
+                                            controller: _whatsappController,
+                                            keyboardType: TextInputType.phone,
+                                            style: GoogleFonts.poppins(
+                                              textStyle: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.black),
+                                            ),
+                                            decoration: InputDecoration(
+                                              hintText: 'Enter Whatsapp Number',
+                                              border: InputBorder.none,
+                                            ),
+                                            textInputAction:
+                                                TextInputAction.next,
+                                            validator: (value) {
+                                              final validationMessage =
+                                                  _validatePhoneNumber(value);
+                                              if (validationMessage != null) {
+                                                return validationMessage;
+                                              }
+                                              return _validateMatchingNumbers();
+                                            },
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0, right: 8),
-                                  child: Container(
-                                    width: double.infinity,
-                                    height: 40.sp,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(10.0),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.5),
-                                          spreadRadius: 2,
-                                          blurRadius: 7,
-                                          offset: Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Flexible(
-                                          child: Padding(
-                                            padding:
-                                            EdgeInsets.symmetric(horizontal: 8.0),
-                                            child: TextFormField(
-                                              controller: _whatsappController,
-                                              keyboardType: TextInputType.phone,
-                                              style: GoogleFonts.poppins(
-                                                textStyle: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.normal,
-                                                    color: Colors.black),
-                                              ),
-                                              decoration: InputDecoration(
-                                                hintText: 'Enter Whatsapp Number',
-                                                border: InputBorder.none,
-                                              ),
-                                              textInputAction: TextInputAction.next,
-                                              validator: (value) {
-                                                final validationMessage = _validatePhoneNumber(value);
-                                                if (validationMessage != null) {
-                                                  return validationMessage;
-                                                }
-                                                return _validateMatchingNumbers();
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-
-                      if(_feedback.isNotEmpty)
+                    ),
+                    if (_feedback.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           _feedback,
                           style: TextStyle(
                             fontSize: TextSizes.textsmall,
-                            color: _feedback.contains('matches') ? Colors.red : Colors.red,
-
+                            color: _feedback.contains('matches')
+                                ? Colors.red
+                                : Colors.red,
                           ),
                         ),
                       ),
-                    ],
-                  ),
-
+                  ],
+                ),
               ),
 
               // 10
@@ -1632,11 +1792,13 @@ class _PostPropertyState extends State<PostProperty> {
                             textStyle: TextStyle(
                               color: Colors.black,
                               fontSize: 16.sp, // Adjust font size as needed
-                              fontWeight: FontWeight.bold, // Adjust font weight as needed
+                              fontWeight: FontWeight
+                                  .bold, // Adjust font weight as needed
                             ),
                           ),
                         ),
-                        textAlign: TextAlign.start, // Ensure text starts at the beginning
+                        textAlign: TextAlign
+                            .start, // Ensure text starts at the beginning
                       ),
                     ),
                     Stack(
@@ -1676,7 +1838,7 @@ class _PostPropertyState extends State<PostProperty> {
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child:DropdownButtonHideUnderline(
+                              child: DropdownButtonHideUnderline(
                                 child: DropdownButton<String>(
                                   value: _selectedfacing,
                                   onChanged: (String? newValue) {
@@ -1684,8 +1846,17 @@ class _PostPropertyState extends State<PostProperty> {
                                       _selectedfacing = newValue!;
                                     });
                                   },
-                                  items: <String>['North', 'West', 'South', 'East', 'North-East', 'North-West', 'South-East', 'South-West']
-                                      .map<DropdownMenuItem<String>>((String value) {
+                                  items: <String>[
+                                    'North',
+                                    'West',
+                                    'South',
+                                    'East',
+                                    'North-East',
+                                    'North-West',
+                                    'South-East',
+                                    'South-West'
+                                  ].map<DropdownMenuItem<String>>(
+                                      (String value) {
                                     return DropdownMenuItem<String>(
                                       value: value,
                                       child: Text(
@@ -1797,7 +1968,9 @@ class _PostPropertyState extends State<PostProperty> {
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 8.0),
                                     child: TextField(
-                                      keyboardType: TextInputType.name,
+                                      controller: propertyFloorController,
+
+                                      keyboardType: TextInputType.number,
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(
                                             fontSize: TextSizes.textsmall,
@@ -1916,7 +2089,9 @@ class _PostPropertyState extends State<PostProperty> {
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 8.0),
                                     child: TextField(
-                                      keyboardType: TextInputType.name,
+                                      controller: propertyBedroomsController,
+
+                                      keyboardType: TextInputType.number,
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(
                                             fontSize: TextSizes.textsmall,
@@ -2035,7 +2210,9 @@ class _PostPropertyState extends State<PostProperty> {
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 8.0),
                                     child: TextField(
-                                      keyboardType: TextInputType.name,
+                                      controller: propertyKitchenController,
+
+                                      keyboardType: TextInputType.number,
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(
                                             fontSize: TextSizes.textsmall,
@@ -2154,7 +2331,9 @@ class _PostPropertyState extends State<PostProperty> {
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 8.0),
                                     child: TextField(
-                                      keyboardType: TextInputType.name,
+                                      controller: propertyBathroomController,
+
+                                      keyboardType: TextInputType.number,
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(
                                             fontSize: TextSizes.textsmall,
@@ -2273,8 +2452,10 @@ class _PostPropertyState extends State<PostProperty> {
                                 Flexible(
                                   child: Padding(
                                     padding:
-                                    EdgeInsets.symmetric(horizontal: 8.0),
+                                        EdgeInsets.symmetric(horizontal: 8.0),
                                     child: TextField(
+                                      controller: propertyMessageController,
+
                                       keyboardType: TextInputType.name,
                                       style: GoogleFonts.poppins(
                                         textStyle: TextStyle(
@@ -2389,95 +2570,105 @@ class _PostPropertyState extends State<PostProperty> {
                 ),
               ),
 
-          Padding(
-            padding:  EdgeInsets.only(top: 18.sp),
-            child: Padding(
-              padding:  EdgeInsets.only(left: 8.sp,right: 8.sp),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Checkbox(
-                        value: _isWater,
-                        activeColor: Colors.orange,
-
-                        onChanged: (bool? value) {
-                          setState(() {
-                            _isWater = value ?? false;
-                          });
-                        },
-                      ),
-                      Text('Water 24/7',style: TextStyle(color: Colors.black),)
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Checkbox(
-                        value: _isInvertor,
-                        activeColor: Colors.orange,
-
-                        onChanged: (bool? value) {
-                          setState(() {
-                            _isInvertor = value ?? false;
-                          });
-                        },
-                      ),
-                      Text('Invertor',style: TextStyle(color: Colors.black),)
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Checkbox(
-                        value: _isSecurity,
-                        activeColor: Colors.orange,
-
-                        onChanged: (bool? value) {
-                          setState(() {
-                            _isSecurity = value ?? false;
-                          });
-                        },
-                      ),
-                      Text('Security',style: TextStyle(color: Colors.black),)
-                    ],
-                  ),
-
-
-                ],
-              ),
-            ),
-          ),
               Padding(
-                padding:  EdgeInsets.only(left: 8.sp,right: 8.sp),
+                padding: EdgeInsets.only(top: 18.sp),
+                child: Padding(
+                  padding: EdgeInsets.only(left: 8.sp, right: 8.sp),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Checkbox(
+                            value: _isWater,
+                            activeColor: Colors.orange,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                _isWater = value ?? false;
+                                waterValue = _isWater ? 1: 0;
+
+                              });
+                            },
+                          ),
+                          Text(
+                            'Water 24/7',
+                            style: TextStyle(color: Colors.black),
+                          )
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Checkbox(
+                            value: _isInvertor,
+                            activeColor: Colors.orange,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                _isInvertor = value ?? false;
+                                invertorValue = _isInvertor ? 1 : 0;
+
+                              });
+                            },
+                          ),
+                          Text(
+                            'Invertor',
+                            style: TextStyle(color: Colors.black),
+                          )
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Checkbox(
+                            value: _isSecurity,
+                            activeColor: Colors.orange,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                _isSecurity = value ?? false;
+                                securityValue = _isSecurity ? 1 : 0;
+
+                              });
+                            },
+                          ),
+                          Text(
+                            'Security',
+                            style: TextStyle(color: Colors.black),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 8.sp, right: 8.sp),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Checkbox(
                           value: _isCarParking,
                           activeColor: Colors.orange,
-
                           onChanged: (bool? value) {
                             setState(() {
                               _isCarParking = value ?? false;
+                              parkingValue = _isCarParking ? 1 : 0;
+                              // Now you can use parkingValue as needed
                             });
                           },
                         ),
-                        Text('Car Parking',style: TextStyle(color: Colors.black),)
+                        Text(
+                          'Car Parking',
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ],
-                    ),
-
+                    )
                   ],
                 ),
               ),
-
-
 
               SizedBox(height: 50.sp),
               SizedBox(
@@ -2492,12 +2683,16 @@ class _PostPropertyState extends State<PostProperty> {
                   child: Text(
                     "Submit",
                     style: GoogleFonts.poppins(
-                      textStyle: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.normal, color: Colors.black),
+                      textStyle: TextStyle(
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black),
                     ),
                   ),
                   onPressed: () {
                     if (_formKey.currentState?.validate() ?? false) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Validation successful')));
+                      addPost(imageFileList);
+                      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Validation successful')));
                     }
                   },
                 ),

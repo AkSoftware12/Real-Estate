@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
@@ -25,10 +26,10 @@ class ResidentialScreen extends StatefulWidget {
 }
 
 class _ResidentialScreenState extends State<ResidentialScreen> {
-  final List<String> items = ['1 Bhk', '2 Bhk', '3 Bhk', '4 Bhk', '5 Bhk'];
   var _dotPosition=0;
   bool isLoading = true;
   List<dynamic> allProperty = [];
+  List<dynamic> subcategory = [];
 
 
   final List<String> _images = [
@@ -42,6 +43,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
   void initState() {
     super.initState();
     allPropertyapi();
+    ResidentialCategory();
   }
   Future<void> allPropertyapi() async {
     final response = await http.get(Uri.parse(allPropertys));
@@ -49,6 +51,21 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
       final data = jsonDecode(response.body)['data'];
       setState(() {
         allProperty = data;
+        isLoading = false;
+      });
+    } else {
+      // Handle error
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+  Future<void> ResidentialCategory() async {
+    final response = await http.get(Uri.parse('${category}${'2'}'));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['subcategory'];
+      setState(() {
+        subcategory = data;
         isLoading = false;
       });
     } else {
@@ -289,7 +306,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                 height: 50.sp,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: items.length,
+                  itemCount: subcategory.length,
                   itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
                       onTap: (){
@@ -304,7 +321,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
-                            width: 80,
+
                             // margin: EdgeInsets.all(12.sp),
                             padding: EdgeInsets.all(12.0),
                             decoration: BoxDecoration(
@@ -312,13 +329,16 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                               borderRadius: BorderRadius.circular(5.0),
                             ),
                             child: Center(
-                              child: Text(
-                                items[index],
-                                style: GoogleFonts.poppins(
-                                  textStyle: TextStyle(
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.normal,
-                                      color: Colors.black),
+                              child: Padding(
+                                padding:  EdgeInsets.only(left: 8.sp,right: 8.sp),
+                                child: Text(
+                                  subcategory[index]['name'],
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.black),
+                                  ),
                                 ),
                               ),
                             ),
@@ -553,13 +573,28 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                       children: [
                         SizedBox(
                           height: 90.sp,
+                          width: double.infinity,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              "${allProperty[index]['picture_urls'][0].toString()}",
+                            child: CachedNetworkImage(
                               height: 90.sp,
-                              fit: BoxFit.fill,
+                              imageUrl:  allProperty[index]['picture_urls'][0].toString(),
+                              fit: BoxFit.cover, // Adjust this according to your requirement
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.orangeAccent,
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Image.asset(
+                                'assets/no_image.jpg', // Path to your default image asset
+                                height: 90.sp, // Adjust width as per your requirement
+                                fit: BoxFit.cover, // Adjust this according to your requirement
+                              ),
                             ),
+
+
+
+
                           ),
                         ),
                         Padding(
