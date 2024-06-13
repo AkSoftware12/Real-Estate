@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -7,13 +10,20 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:realestate/ChangePassword/change_password.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
 import 'package:realestate/HomePage/home_page.dart';
 import 'package:realestate/RegisterPage/register_page.dart';
 import 'package:realestate/ResetPassword/reset_password.dart';
 import 'package:realestate/Utils/color.dart';
+import 'package:realestate/baseurl/baseurl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OtpVerifyPage extends StatefulWidget {
+  final String email;
+
+  const OtpVerifyPage({super.key, required this.email});
+
   @override
   State<OtpVerifyPage> createState() => _OtpVerifyPageState();
 }
@@ -27,10 +37,97 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
 
   // ..text = "123456";
   StreamController<ErrorAnimationType>? errorController;
-
+  String email = "";
+  String password = "";
+  bool _isLoading = false;
   bool hasError = false;
 
   String currentText = "";
+
+
+  Future<void> verifyOtpApi(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(
+                color: Colors.orangeAccent,
+              ),
+              // SizedBox(width: 16.0),
+              // Text("Logging in..."),
+            ],
+          ),
+        );
+      },
+    );
+
+    try {
+      final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+      String? deviceToken = await _firebaseMessaging.getToken();
+      print('Device id: $deviceToken');
+
+      String otp = textEditingController.text;
+
+      if (formKey.currentState!.validate()) {
+        setState(() {
+          _isLoading = true;
+        });
+        String apiUrl = verifyOtp; // Replace with your API endpoint
+
+        final response = await http.post(
+          Uri.parse(apiUrl),
+          body: {
+            'email': widget.email,
+            'otp': otp,
+            'device_id': deviceToken,
+          },
+        );
+        setState(() {
+          _isLoading =
+          false; // Set loading state to false after registration completes
+        });
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> responseData = json.decode(response.body);
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          final String token = responseData['token'];
+          // Save token using shared_preferences
+          await prefs.setString('tokenForgot', token);
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChangePasswordPage(),
+            ),
+          );
+
+          print('verify otp successfully!');
+          // print(token);
+          print(response.body);
+        } else {
+          // Registration failed
+          // You may handle the error response here, e.g., show an error message
+          print('otp failed!');
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading =
+        false; // Set loading state to false after registration completes
+      });
+      Navigator.pop(context); // Close the progress dialog
+      // Handle errors appropriately
+      print('Error during login: $e');
+      // Show a snackbar or display an error message
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to log in. Please try again.'),
+      ));
+    }
+  }
+
 
 
   @override
@@ -135,7 +232,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                             color: Colors.orange.shade600,
                             fontWeight: FontWeight.bold,
                           ),
-                          length: 6,
+                          length: 4,
                           obscureText: true,
                           obscuringCharacter: '*',
                           obscuringWidget: Icon(Icons.star,size: 24,color: Colors.white,),
@@ -213,24 +310,34 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                         height: 50,
                         child: TextButton(
                           onPressed: () {
-                            formKey.currentState!.validate();
-                            // conditions for validating
-                            if (currentText.length != 6 || currentText != "123456") {
-                              errorController!.add(ErrorAnimationType
-                                  .shake); // Triggering error shake animation
-                              setState(() => hasError = true);
-                            } else {
+
+                            if (formKey.currentState!.validate()) {
+
+                              verifyOtpApi(context);
 
 
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=> ResetPasswordPage()),);
-
-                              setState(
-                                    () {
-                                  hasError = false;
-                                  snackBar("OTP Verified!!");
-                                },
-                              );
                             }
+
+
+                            // formKey.currentState!.validate();
+                            // // conditions for validating
+                            // if (currentText.length != 4 || currentText != "1234") {
+                            //   errorController!.add(ErrorAnimationType
+                            //       .shake); // Triggering error shake animation
+                            //   setState(() => hasError = true);
+                            // } else {
+                            //
+                            //
+                            //
+                            //   // Navigator.push(context, MaterialPageRoute(builder: (context)=> ResetPasswordPage()),);
+                            //
+                            //   setState(
+                            //         () {
+                            //       hasError = false;
+                            //       snackBar("OTP Verified!!");
+                            //     },
+                            //   );
+                            // }
                           },
                           child: Center(
                             child: Text(

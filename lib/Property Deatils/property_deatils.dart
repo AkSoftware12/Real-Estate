@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,16 +9,20 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/All%20Property/all_property.dart';
 import 'package:realestate/AllImage/All_image_property.dart';
+import 'package:realestate/ApiModel/ResidentialPropertyModel/residential_property_model.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
 import 'package:realestate/Model/image_model.dart';
 import 'package:realestate/Property%20Deatils/property_deatils.dart';
 import 'package:realestate/Utils/textSize.dart';
+import 'package:realestate/baseurl/baseurl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
 
 
 class PropertyDeatilsPage extends StatefulWidget {
-  const PropertyDeatilsPage({super.key});
+  final String? id;
+   const PropertyDeatilsPage({super.key,  this.id});
 
   @override
   State<PropertyDeatilsPage> createState() => _PropertyDeatilsPageState();
@@ -28,6 +34,19 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
   bool _isExpanded2 = true;
   bool _isExpanded3 = true;
   bool _isExpanded34 = true;
+  List<dynamic> propertyInfo = [];
+  List<dynamic> imageInfo = [];
+
+
+  String location = '';
+  String price = '';
+  String security_amt = '';
+  String owner_whatsapp = '';
+  String owner_contact = '';
+  String area = '';
+  String floor = '';
+  String property_state = '';
+  String property_district = '';
 
 
   final List<ImageModel> images = [
@@ -37,6 +56,13 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
     ImageModel(imageUrl:    'https://5.imimg.com/data5/JS/DP/IQ/IOS-69757314/product-jpeg-500x500.png',),
 
   ];
+
+  @override
+  void initState(){
+    super.initState();
+    fetchProperty();
+
+  }
 
   _launchURL(url) async {
     try {
@@ -53,13 +79,40 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
       // log error
     }
   }
+
+
+
+  Future<void> fetchProperty() async {
+    final response = await http.get(Uri.parse('${addPropertyInfo}${widget.id}'));
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+
+      setState(() {
+        location= jsonData['property']['property_address'];
+
+        imageInfo=jsonData['property']['picture_urls'];
+        price = jsonData['property']['property_price'];
+        security_amt = jsonData['property']['security_amt'];
+        owner_contact = jsonData['property']['owner_contact'];
+        owner_whatsapp = jsonData['property']['owner_whatsapp'];
+        area = jsonData['property']['bulidup_area'];
+        floor = jsonData['property']['floor'];
+        property_district = jsonData['property']['property_district'];
+        property_state = jsonData['property']['property_state'];
+
+      });
+    } else {
+      throw Exception('Failed to load profile data');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: HexColor('#f6f6f7'),
         title: Text(
-          'Property Deatils',
+          'Property Deatils ',
           style:GoogleFonts.poppins(
             textStyle: TextStyle(
               color: Colors.black,
@@ -69,7 +122,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
           )
         ),
       ),
-      body: SingleChildScrollView(
+      body:SingleChildScrollView(
         child: Padding(
           padding:  EdgeInsets.only(bottom: 50.sp),
           child: Container(
@@ -88,7 +141,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                             },
                             child: AspectRatio(
                               aspectRatio: 2.5,
-                              child: CarouselSlider(items:images.map((item) =>
+                              child: CarouselSlider(items:imageInfo.map((item) =>
                                   Padding(
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 5,
@@ -118,7 +171,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
 
                                           },
                                           child: Image.network(
-                                            item!.imageUrl.toString(),
+                                            item,
                                             fit: BoxFit.fill,
                                           ),
                                         ),
@@ -233,7 +286,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                           child: GestureDetector(
                             onTap: (){
 
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=> AllImageProperty(items: images,)),);
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=> AllImageProperty(items: imageInfo,)),);
 
                               // Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
 
@@ -274,7 +327,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                 ],
                               ),
                               Text(
-                                '2021 San Pedro, Los Angeles 90',
+                                '${location}',
                                 maxLines: 1,
                                 style: GoogleFonts.poppins(
                                   textStyle: TextStyle(
@@ -307,7 +360,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                 ),
                               ),
                               Text(
-                                '5000',
+                                '${price}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.poppins(
@@ -410,10 +463,10 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                     Divider(
-                                       height: 1.sp,
-                                       color: Colors.grey.shade200,
-                                     ),
+                                      Divider(
+                                        height: 1.sp,
+                                        color: Colors.grey.shade200,
+                                      ),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
@@ -444,7 +497,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                                       ),
                                                       SizedBox(height: 5.sp,),
                                                       Text(
-                                                        "1950 sqft" ,
+                                                        "${area}" ,
                                                         style: GoogleFonts.radioCanada(
                                                           // Replace with your desired Google Font
                                                           textStyle: TextStyle(
@@ -480,7 +533,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                                       ),),
                                                     SizedBox(height: 5.sp,),
                                                     Text(
-                                                      "8 (Out of 9 Floors)" ,
+                                                      "${floor}" ,
                                                       style: GoogleFonts.radioCanada(
                                                         // Replace with your desired Google Font
                                                         textStyle: TextStyle(
@@ -515,7 +568,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                                       ),),
                                                     SizedBox(height: 5.sp,),
                                                     Text(
-                                                      "Rajpur Road, Dehradun" ,
+                                                      "${property_district} ${','}${property_state}" ,
                                                       style: GoogleFonts.radioCanada(
                                                         // Replace with your desired Google Font
                                                         textStyle: TextStyle(
@@ -1340,7 +1393,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                                           ),
                                                         ),
                                                       ),
-                                                       Divider(
+                                                      Divider(
                                                         height: 5.sp,
                                                         color: Colors.black,
                                                       ),
@@ -1634,7 +1687,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                             .width *
                                             0.99,
 
-                                 // padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
+                                        // padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
                                         decoration: BoxDecoration(
                                           color: Colors.white,
                                           borderRadius:
@@ -1643,7 +1696,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                         ),
                                         child:GestureDetector(
                                           onTap: (){
-                                            Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                                            // Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
                                           },
                                           child: Container(
 
@@ -2028,6 +2081,10 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
           ),
         ),
       ),
+
+
+
+
 
       bottomSheet: Container(
       height: 50.sp,

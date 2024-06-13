@@ -109,7 +109,7 @@ class AllCommercialPropertyState extends State<AllCommercialProperty> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => PropertyDeatilsPage()),
+                            builder: (context) => PropertyDeatilsPage(id: '',)),
                       );
                     },
                     child: Container(

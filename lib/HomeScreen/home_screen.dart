@@ -389,7 +389,7 @@ class _CommercialScreenState extends State<CommercialScreen> {
                     Spacer(),
                     GestureDetector(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage(id: '',)),);
 
                       },
                       child: Text(
@@ -416,7 +416,7 @@ class _CommercialScreenState extends State<CommercialScreen> {
                       4,
                           (index) => GestureDetector(
                         onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage(id: '',)),);
 
                         },
                         child: Container(
@@ -548,7 +548,7 @@ class _CommercialScreenState extends State<CommercialScreen> {
                     Spacer(),
                     GestureDetector(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage(id: '',)),);
 
                       },
                       child: Text(
@@ -575,7 +575,7 @@ class _CommercialScreenState extends State<CommercialScreen> {
                     // Here you can build your list item based on the index
                     return GestureDetector(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage(id: '',)),);
 
                       },
                       child: Container(
@@ -902,7 +902,7 @@ class _CommercialScreenState extends State<CommercialScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: GestureDetector(
                           onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage(id: '',)),);
 
                           },
                           child: Container(

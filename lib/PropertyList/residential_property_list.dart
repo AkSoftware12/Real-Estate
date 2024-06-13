@@ -365,7 +365,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                     Spacer(),
                     GestureDetector(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage(id: '',)),);
 
                       },
                       child: Text(
@@ -392,7 +392,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                       4,
                           (index) => GestureDetector(
                         onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage(id: '',)),);
 
                         },
                         child: Container(
@@ -527,7 +527,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                     Spacer(),
                     GestureDetector(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage(id: '',)),);
 
                       },
                       child: Text(
@@ -553,12 +553,12 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
               allProperty.length, // Use the length of allProperty
                   (index) => GestureDetector(
                 onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => PropertyDetailsPage(),
-                  //   ),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PropertyDeatilsPage(id: allProperty[index]['id'].toString()),
+                    ),
+                  );
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -699,7 +699,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                     Spacer(),
                     GestureDetector(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage(id: '',)),);
 
                       },
                       child: Text(
@@ -726,7 +726,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                     // Here you can build your list item based on the index
                     return GestureDetector(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage(id: '',)),);
 
                       },
                       child: Container(
@@ -1053,7 +1053,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: GestureDetector(
                           onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage()),);
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage(id: '',)),);
 
                           },
                           child: Container(
