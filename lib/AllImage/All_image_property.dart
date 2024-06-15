@@ -26,7 +26,7 @@ class _AllImagePropertyState extends State<AllImageProperty> {
         itemCount: widget.items.length,
           itemBuilder: (BuildContext context,index){
             return  Container(
-              height: 160.sp,
+              height: 195.sp,
               width: double.infinity,
 
               decoration: BoxDecoration(
@@ -37,7 +37,7 @@ class _AllImagePropertyState extends State<AllImageProperty> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SizedBox(
-                    height: 160.sp,
+                    height: 195.sp,
                     width: double.infinity,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),

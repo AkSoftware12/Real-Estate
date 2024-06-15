@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
 import 'package:realestate/HomePage/home_page.dart';
@@ -85,7 +86,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               builder: (context) => OtpVerifyPage(email: emailController.text,),
             ),
           );
-
+          Fluttertoast.showToast(
+            msg: "${'Otp :- '}${responseData['otp']}",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
 
 
           print('OTP Send successfully!');

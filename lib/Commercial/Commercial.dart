@@ -1,53 +1,45 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/All%20Property/all_property.dart';
-import 'package:realestate/ApiModel/ResidentialPropertyModel/residential_property_model.dart';
+import 'package:realestate/AllCommercialProperty/all_commercial_property.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
+import 'package:realestate/Model/property_type.dart';
 import 'package:realestate/Property%20Deatils/property_deatils.dart';
-import 'package:realestate/ResidentialAllProperty/residential_all_property.dart';
 import 'package:realestate/Utils/textSize.dart';
 import 'package:http/http.dart' as http;
 import 'package:realestate/baseurl/baseurl.dart';
 
-class ResidentialScreen extends StatefulWidget {
+class CommercialScreen extends StatefulWidget {
 
-
-  ResidentialScreen({super.key});
+  CommercialScreen({super.key});
 
   @override
-  State<ResidentialScreen> createState() => _ResidentialScreenState();
+  State<CommercialScreen> createState() => _CommercialScreenState();
 }
 
-class _ResidentialScreenState extends State<ResidentialScreen> {
-  var _dotPosition=0;
+class _CommercialScreenState extends State<CommercialScreen> {
   bool isLoading = true;
-  List<dynamic> allProperty = [];
   List<dynamic> subcategory = [];
-
-
-  final List<String> _images = [
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoz_5HDm5Raa-Imfc-OnNf-KXwzA2Ox3Zcp0nbFoEFtzCaY5mVg_V3Xpxc2ovY5FsmLOs&usqp=CAU',
-    'https://www.pngmart.com/files/15/Vector-Home-PNG-Photos.png',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDsWnStDcZz9gMZfigH_LesuQiplssDYUr5jYqV-f5DQ&s',
-    'https://5.imimg.com/data5/JS/DP/IQ/IOS-69757314/product-jpeg-500x500.png',
+  List<PropertyTypeModel> property = [
+    PropertyTypeModel(
+        imageUrl: 'assets/customImages/workplace.png', text: 'Office Space'),
+    PropertyTypeModel(imageUrl: 'assets/customImages/co-working.png',
+        text: 'Co-Working Space'),
+    PropertyTypeModel(
+        imageUrl: 'assets/customImages/shop.png', text: 'Shop / Showroom'),
+    PropertyTypeModel(
+        imageUrl: 'assets/customImages/package.png', text: 'Other Commercial'),
   ];
+  List<dynamic> allProperty = [];
 
-  @override
-  void initState() {
-    super.initState();
-    allPropertyapi();
-    ResidentialCategory();
-  }
+
   Future<void> allPropertyapi() async {
-    final response = await http.get(Uri.parse(getAllResidentialProperties));
+    final response = await http.get(Uri.parse(getAllCommercialProperties));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body)['property'];
       setState(() {
@@ -61,8 +53,18 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
       });
     }
   }
-  Future<void> ResidentialCategory() async {
-    final response = await http.get(Uri.parse('${category}${'2'}'));
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    CommercialCategory();
+    allPropertyapi();
+  }
+
+  Future<void> CommercialCategory() async {
+    final response = await http.get(Uri.parse('${category}${'1'}'));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body)['subcategory'];
       setState(() {
@@ -77,279 +79,205 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
-    return   SingleChildScrollView(
+    return SingleChildScrollView(
       child: Container(
           width: double.infinity, // Take full width of the screen
-          child:Column(
+          child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(0.0),
+                padding: const EdgeInsets.all(15.0),
                 child: Column(
                   children: [
-                    Padding(
-                      padding:  EdgeInsets.all(15.sp),
-                      child: Container(
-                        width: double.infinity,
-                        height: 50.sp,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 2,
-                              blurRadius: 7,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                child: TextField(
-                                  style: GoogleFonts.poppins(
-                                    textStyle: TextStyle(
-                                        fontSize: 15.sp,
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.black),
-                                  ),
-                                  decoration: InputDecoration(
-                                    hintText: 'Search',
-                                    border: InputBorder.none,
-                                    prefixIcon:
-                                    Icon(Icons.search, color: Colors.black),
-                                  ),
-                                  textInputAction: TextInputAction.next,
-                                  // This sets the keyboard action to "Next"
-                                  onEditingComplete: () =>
-                                      FocusScope.of(context).nextFocus(),
+                    Container(
+                      width: double.infinity,
+                      height: 50.sp,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 2,
+                            blurRadius: 7,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8.0),
+                              child: TextField(
+                                style: GoogleFonts.poppins(
+                                  textStyle: TextStyle(
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.black),
                                 ),
+                                decoration: InputDecoration(
+                                  hintText: 'Search',
+                                  border: InputBorder.none,
+                                  prefixIcon:
+                                  Icon(Icons.search, color: Colors.black),
+                                ),
+                                textInputAction: TextInputAction.next,
+                                // This sets the keyboard action to "Next"
+                                onEditingComplete: () =>
+                                    FocusScope.of(context).nextFocus(),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                     SizedBox(
                       height: 10,
                     ),
-
-                    Column(
-                        children: [
-                          GestureDetector(
-                            onTap: (){
-
-
-
-                            },
-                            child: AspectRatio(
-                              aspectRatio: 2.5,
-                              child: CarouselSlider(items:_images.map((item) =>
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 5,
-                                        vertical: 10),
-                                    child: Material(
-                                      elevation: 5,
-                                      borderRadius:
-                                      BorderRadius.circular(
-                                          8.0),
-                                      clipBehavior: Clip.hardEdge,
-                                      child: Container(
-                                        height:  150.sp,
-                                        width:
-                                        MediaQuery.of(context)
-                                            .size
-                                            .width *
-                                            0.99,
-
-
-                                        padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                          BorderRadius.circular(
-                                              5.0),
-                                        ),
-                                        child: GestureDetector(
-                                          onTap: (){
-
-                                          },
-                                          child: Image.network(
-                                            item,
-                                            fit: BoxFit.fill,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                //     Container(
-                                //   decoration: BoxDecoration(
-                                //       borderRadius:
-                                //       BorderRadius.circular(
-                                //           20.0),
-                                //       image: DecorationImage(image: NetworkImage( imageBaseUrl +
-                                //           item['banner_img']),fit:BoxFit.fitWidth)
-                                //   ),
-                                // )
-                              ).toList(),options: CarouselOptions(
-                                  height:  150.sp,
-                                  aspectRatio: 2/1,
-                                  viewportFraction: 0.95,
-                                  initialPage: 0,
-                                  enableInfiniteScroll: true,
-                                  reverse: false,
-                                  autoPlay: true,
-                                  autoPlayInterval: const Duration(seconds: 3),
-                                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                                  autoPlayCurve: Curves.fastOutSlowIn,
-                                  enlargeCenterPage: false,
-                                  enlargeFactor: 0.3,
-                                  onPageChanged: (val,carouselPageChangedReason) {
-                                    setState(() {
-                                      _dotPosition = val;
-                                    },);
-                                  }
-
-                              )),
-                            ),
-                          ),
-                          const SizedBox(height: 1),
-                          DotsIndicator(
-                            dotsCount: _images.isEmpty?1:_images.length,
-                            position: _dotPosition,
-                            decorator: const DotsDecorator(
-                              activeColor: Colors.orange,
-                              color: Colors.blueGrey,
-                              spacing: EdgeInsets.all(2),
-                              activeSize: Size(8, 8),
-                              size: Size(6, 6),
-                            ),
-                          ),
-                        ]
-
-
-                    ),
-
-                    // Padding(
-                    //   padding:  EdgeInsets.all(15.sp),
-                    //   child: Container(
-                    //     width: double.infinity,
-                    //     height: 150.sp,
-                    //     decoration: BoxDecoration(
-                    //       color: Colors.white,
-                    //       borderRadius: BorderRadius.circular(10.0),
-                    //       // Rounded corners with radius 10
-                    //       boxShadow: [
-                    //         BoxShadow(
-                    //           color: Colors.grey.withOpacity(0.5),
-                    //           spreadRadius: 2,
-                    //           blurRadius: 7,
-                    //           offset: Offset(0, 3),
+                    // Container(
+                    //   width: double.infinity,
+                    //   height: 150.sp,
+                    //   decoration: BoxDecoration(
+                    //     color: Colors.white,
+                    //     borderRadius: BorderRadius.circular(10.0),
+                    //     // Rounded corners with radius 10
+                    //     boxShadow: [
+                    //       BoxShadow(
+                    //         color: Colors.grey.withOpacity(0.5),
+                    //         spreadRadius: 2,
+                    //         blurRadius: 7,
+                    //         offset: Offset(0, 3),
+                    //       ),
+                    //     ],
+                    //   ),
+                    //   child: Stack(
+                    //     children: [
+                    //       Container(
+                    //         decoration: BoxDecoration(
+                    //           image: DecorationImage(
+                    //             image: AssetImage(
+                    //                 "assets/customImages/bannerImg.png"),
+                    //             fit: BoxFit.cover,
+                    //           ),
+                    //           borderRadius: BorderRadius.circular(
+                    //               10.0), // Match the parent container's rounded corners
                     //         ),
-                    //       ],
-                    //     ),
-                    //     child: Stack(
-                    //       children: [
-                    //         Container(
-                    //           decoration: BoxDecoration(
-                    //             image: DecorationImage(
-                    //               image: AssetImage(
-                    //                   "assets/customImages/bannerImg.png"),
-                    //               fit: BoxFit.cover,
+                    //       ),
+                    //       Container(
+                    //         padding: EdgeInsets.all(16.sp),
+                    //         child: Column(
+                    //           crossAxisAlignment: CrossAxisAlignment.start,
+                    //           children: [
+                    //             Text(
+                    //               "Real Estate Solutions",
+                    //               style: GoogleFonts.poppins(
+                    //                 textStyle: TextStyle(
+                    //                     fontSize: 15.sp,
+                    //                     fontWeight: FontWeight.bold,
+                    //                     color: Colors.white),
+                    //               ),
                     //             ),
-                    //             borderRadius: BorderRadius.circular(
-                    //                 10.0), // Match the parent container's rounded corners
-                    //           ),
+                    //             SizedBox(
+                    //               height: 15.sp,
+                    //             ),
+                    //             Text(
+                    //               "We are here to \n providing best deal \n on properties.",
+                    //               style: GoogleFonts.poppins(
+                    //                 textStyle: TextStyle(
+                    //                     fontSize: 12.sp,
+                    //                     fontWeight: FontWeight.normal,
+                    //                     color: Colors.white),
+                    //               ),
+                    //             ),
+                    //             SizedBox(height: 20.sp),
+                    //           ],
                     //         ),
-                    //         Container(
-                    //           padding: EdgeInsets.all(16.sp),
-                    //           child: Column(
-                    //             crossAxisAlignment: CrossAxisAlignment.start,
-                    //             children: [
-                    //               Text(
-                    //                 "Real Estate Solutions",
-                    //                 style: GoogleFonts.poppins(
-                    //                   textStyle: TextStyle(
-                    //                       fontSize: 15.sp,
-                    //                       fontWeight: FontWeight.bold,
-                    //                       color: Colors.white),
-                    //                 ),
-                    //               ),
-                    //               SizedBox(
-                    //                 height: 15.sp,
-                    //               ),
-                    //               Text(
-                    //                 "We are here to \n providing best deal \n on properties.",
-                    //                 style: GoogleFonts.poppins(
-                    //                   textStyle: TextStyle(
-                    //                       fontSize: 12.sp,
-                    //                       fontWeight: FontWeight.normal,
-                    //                       color: Colors.white),
-                    //                 ),
-                    //               ),
-                    //               SizedBox(height: 20.sp),
-                    //             ],
-                    //           ),
-                    //         ),
-                    //       ],
-                    //     ),
+                    //       ),
+                    //     ],
                     //   ),
                     // ),
                   ],
                 ),
               ),
-              SizedBox(
-                height: 50.sp,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: subcategory.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return GestureDetector(
-                      onTap: (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ApartmentListing(backButton: 'back')),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 7.0),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
 
-                            // margin: EdgeInsets.all(12.sp),
-                            padding: EdgeInsets.all(12.0),
-                            decoration: BoxDecoration(
-                              color: HexColor('#f6f6f7'),
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                            child: Center(
-                              child: Padding(
-                                padding:  EdgeInsets.only(left: 8.sp,right: 8.sp),
-                                child: Text(
-                                  subcategory[index]['name'],
-                                  style: GoogleFonts.poppins(
-                                    textStyle: TextStyle(
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.black),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+              Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Row(
+                  children: [
+                    Text(
+                      'Property Type',
+                      style: GoogleFonts.poppins(
+                        textStyle: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
                       ),
-                    );
-                  },
+                    ),
+
+                  ],
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: SizedBox(
+                  height: 230.sp,
+                  child: GridView.builder(
+                    itemCount: subcategory.length,
+                    physics: NeverScrollableScrollPhysics(),
+
+                    // Example count, replace with your actual count
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2, // Number of columns
+                      crossAxisSpacing: 10.0,
+                      mainAxisSpacing: 10.0,
+                      childAspectRatio: 1.5, // Ratio of item height to width
+                    ),
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> AllCommercialProperty()),);
+
+                        },
+                        child: Container(
+                          height: 50.0,
+                          decoration: BoxDecoration(
+                            color: Colors.pink.shade50,
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+
+                              SizedBox(
+                                  height: 50.sp,
+                                  width: 50.sp,
+                                  child: Image.asset(
+                                    property[index].imageUrl, fit: BoxFit.fill,)),
+                              SizedBox(height: 8.0),
+                              Text(
+                                subcategory[index]['name'],
+                                // Replace this with your text
+                                style: GoogleFonts.poppins(
+                                  textStyle: TextStyle(
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.black),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+
+
               Padding(
                 padding: const EdgeInsets.all(15.0),
                 child: Row(
@@ -510,6 +438,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                   )
               ),
 
+
               // All Property
 
               Padding(
@@ -517,7 +446,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                 child: Row(
                   children: [
                     Text(
-                      'Residential Property',
+                      'Commercial Property',
                       style: GoogleFonts.poppins(
                         textStyle: TextStyle(
                             fontSize: 16.sp,
@@ -528,7 +457,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                     Spacer(),
                     GestureDetector(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> ResidentialAllProperty()),);
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> AllCommercialProperty()),);
 
                       },
                       child: Text(
@@ -545,145 +474,144 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                   ],
                 ),
               ),
-               SizedBox(
-          height: 430,
-          child: GridView.count(
-            physics: NeverScrollableScrollPhysics(), // Disable scrolling
-            crossAxisCount: 2,
-            children: List.generate(
-              allProperty.length, // Use the length of allProperty
-                  (index) => GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PropertyDeatilsPage(id: allProperty[index]['id'].toString()),
-                    ),
-                  );
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: HexColor('#f6f6f7'),
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  margin: EdgeInsets.all(8.0),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: 90.sp,
-                          width: double.infinity,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: CachedNetworkImage(
-                              height: 90.sp,
-                              imageUrl:  allProperty[index]['picture_urls'][0].toString(),
-                              fit: BoxFit.cover, // Adjust this according to your requirement
-                              placeholder: (context, url) => const Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.orangeAccent,
-                                ),
-                              ),
-                              errorWidget: (context, url, error) => Image.asset(
-                                'assets/no_image.jpg', // Path to your default image asset
-                                height: 90.sp, // Adjust width as per your requirement
-                                fit: BoxFit.cover, // Adjust this according to your requirement
-                              ),
-                            ),
-
-
-
-
+              SizedBox(
+                height: 430,
+                child: GridView.count(
+                  physics: NeverScrollableScrollPhysics(), // Disable scrolling
+                  crossAxisCount: 2,
+                  children: List.generate(
+                    allProperty.length, // Use the length of allProperty
+                        (index) => GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PropertyDeatilsPage(id: allProperty[index]['id'].toString()),
                           ),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: HexColor('#f6f6f7'),
+                          borderRadius: BorderRadius.circular(5.0),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5.0),
-                          child: Row(
+                        margin: EdgeInsets.all(8.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                '${allProperty[index]['property_name'].toString()}'.length > 22
-                                    ? '${allProperty[index]['property_name'].toString()}'.substring(0, 22) + '...'
-                                    : '${allProperty[index]['property_name'].toString()}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.poppins(
-                                  textStyle: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5.0),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.location_on,
-                                size: 11.sp,
-                                color: Colors.red,
-                              ),
-                              Text(
-                                '2021 San Pedro, Los Angeles 90'.length > 25
-                                    ? '2021 San Pedro, Los Angeles 90'.substring(0, 25) + '...'
-                                    : '2021 San Pedro, Los Angeles 90',
-                                maxLines: 1,
-                                style: GoogleFonts.poppins(
-                                  textStyle: TextStyle(
-                                    fontSize: 11.sp,
-                                    fontWeight: FontWeight.normal,
-                                    color: HexColor('#9ba3aa'),
+                              SizedBox(
+                                height: 90.sp,
+                                width: double.infinity,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: CachedNetworkImage(
+                                    height: 90.sp,
+                                    imageUrl:  allProperty[index]['picture_urls'][0].toString(),
+                                    fit: BoxFit.cover, // Adjust this according to your requirement
+                                    placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.orangeAccent,
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) => Image.asset(
+                                      'assets/no_image.jpg', // Path to your default image asset
+                                      height: 90.sp, // Adjust width as per your requirement
+                                      fit: BoxFit.cover, // Adjust this according to your requirement
+                                    ),
                                   ),
+
+
+
+
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      '${allProperty[index]['property_name'].toString()}'.length > 22
+                                          ? '${allProperty[index]['property_name'].toString()}'.substring(0, 22) + '...'
+                                          : '${allProperty[index]['property_name'].toString()}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on,
+                                      size: 11.sp,
+                                      color: Colors.red,
+                                    ),
+                                    Text(
+                                      '2021 San Pedro, Los Angeles 90'.length > 25
+                                          ? '2021 San Pedro, Los Angeles 90'.substring(0, 25) + '...'
+                                          : '2021 San Pedro, Los Angeles 90',
+                                      maxLines: 1,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                          fontSize: 11.sp,
+                                          fontWeight: FontWeight.normal,
+                                          color: HexColor('#9ba3aa'),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      '₹ ',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                    Text(
+                                      '${allProperty[index]['property_price'].toString()}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               )
                             ],
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5.0),
-                          child: Row(
-                            children: [
-                              Text(
-                                '₹ ',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.poppins(
-                                  textStyle: TextStyle(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                              ),
-                              Text(
-                                '${allProperty[index]['property_price'].toString()}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.poppins(
-                                  textStyle: TextStyle(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
-        ),
 
 
               // All Property
-
               Padding(
                 padding: const EdgeInsets.all(15.0),
                 child: Row(
@@ -944,8 +872,8 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10.sp),
-                                    color: HexColor('#122636')
+                                      borderRadius: BorderRadius.circular(10.sp),
+                                      color: HexColor('#122636')
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -1136,6 +1064,5 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
           )
       ),
     );
-
   }
 }

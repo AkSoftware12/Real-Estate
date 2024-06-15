@@ -140,7 +140,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
 
                             },
                             child: AspectRatio(
-                              aspectRatio: 2.5,
+                              aspectRatio: 2.0,
                               child: CarouselSlider(items:imageInfo.map((item) =>
                                   Padding(
                                     padding: EdgeInsets.symmetric(
@@ -153,7 +153,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                           8.0),
                                       clipBehavior: Clip.hardEdge,
                                       child: Container(
-                                        height: 165,
+                                        height: 195.sp,
                                         width:
                                         MediaQuery.of(context)
                                             .size
@@ -188,7 +188,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                                 //   ),
                                 // )
                               ).toList(),options: CarouselOptions(
-                                  height: 165.0,
+                                  height: 195.sp,
                                   aspectRatio: 2/1,
                                   viewportFraction: 0.85,
                                   initialPage: 0,
@@ -211,7 +211,7 @@ class _PropertyDeatilsPageState extends State<PropertyDeatilsPage> {
                           ),
                           const SizedBox(height: 1),
                           DotsIndicator(
-                            dotsCount: images.isEmpty?1:images.length,
+                            dotsCount: imageInfo.isEmpty?1:imageInfo.length,
                             position: _dotPosition,
                             decorator: const DotsDecorator(
                               activeColor: Colors.orange,

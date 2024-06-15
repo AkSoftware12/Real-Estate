@@ -1,5 +1,5 @@
-
 import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
@@ -16,16 +16,16 @@ import 'package:realestate/Utils/textSize.dart';
 import 'package:http/http.dart' as http;
 import 'package:realestate/baseurl/baseurl.dart';
 
-class AllCommercialProperty extends StatefulWidget {
+class ResidentialAllProperty extends StatefulWidget {
 
 
-  AllCommercialProperty({super.key});
+  ResidentialAllProperty({super.key});
 
   @override
-  State<AllCommercialProperty> createState() => _ResidentialScreenState();
+  State<ResidentialAllProperty> createState() => _ResidentialScreenState();
 }
 
-class _ResidentialScreenState extends State<AllCommercialProperty> {
+class _ResidentialScreenState extends State<ResidentialAllProperty> {
   bool isLoading = true;
   List<dynamic> allProperty = [];
 
@@ -37,7 +37,7 @@ class _ResidentialScreenState extends State<AllCommercialProperty> {
     allPropertyapi();
   }
   Future<void> allPropertyapi() async {
-    final response = await http.get(Uri.parse(getAllCommercialProperties));
+    final response = await http.get(Uri.parse(getAllResidentialProperties));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body)['property'];
       setState(() {
@@ -56,7 +56,7 @@ class _ResidentialScreenState extends State<AllCommercialProperty> {
   Widget build(BuildContext context) {
     return   Scaffold(
       appBar: AppBar(
-        title: Text('Commercial Property',
+        title: Text('Residential Property',
           style: GoogleFonts.poppins(
             textStyle: TextStyle(
                 fontSize: 15.sp,
@@ -64,9 +64,9 @@ class _ResidentialScreenState extends State<AllCommercialProperty> {
                 color: Colors.black),
           ),),
         leading: GestureDetector(
-            onTap: (){
-              Navigator.pop(context);
-            },
+          onTap: (){
+            Navigator.pop(context);
+          },
             child: Icon(Icons.arrow_back)),
 
       ),

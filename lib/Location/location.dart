@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/All%20Property/all_property.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
+import 'package:realestate/PropertyLocality/property_locality.dart';
 import 'package:realestate/Search/search.dart';
 import 'package:realestate/Utils/textSize.dart';
 
@@ -18,17 +19,18 @@ class CityGrid extends StatefulWidget {
 
 class _CityGridState extends State<CityGrid> {
   final List<Map<String, String>> cities = [
-    {'name': 'Dehradun', 'icon': 'assets/dehradun.png'},
-    {'name': 'Mumbai', 'icon': 'assets/mumbai.png'},
-    {'name': 'Chandigarh', 'icon': 'assets/chandigarh.png'},
+    {'name': 'dehradun', 'icon': 'assets/dehradun.png'},
+    {'name': 'mumbai', 'icon': 'assets/mumbai.png'},
+    {'name': 'chandigarh', 'icon': 'assets/chandigarh.png'},
     {'name': 'New Delhi', 'icon': 'assets/newDelhi.png'},
-    {'name': 'Bangalore', 'icon': 'assets/banglore.png'},
-    {'name': 'Noida', 'icon': 'assets/noida.png'},
+    {'name': 'bangalore', 'icon': 'assets/banglore.png'},
+    {'name': 'noida', 'icon': 'assets/noida.png'},
     {'name': 'Gurgaon', 'icon': 'assets/gurgaon.png'},
     {'name': 'Kolkata', 'icon': 'assets/kolkata.png'},
     {'name': 'Pune', 'icon': 'assets/pune.png'},
     {'name': 'Chennai', 'icon': 'assets/chennai.png'},
     {'name': 'Hyderabad', 'icon': 'assets/hydrabad.png'},
+    {'name': 'saharanpur', 'icon': 'assets/hydrabad.png'},
   ];
 
   @override
@@ -81,7 +83,7 @@ class CityIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> ApartmentListing(backButton: 'back')),);
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> LocalityProperty(localityCity: name,)),);
 
       },
       child: Column(

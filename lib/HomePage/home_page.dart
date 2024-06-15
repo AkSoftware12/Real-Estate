@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -70,6 +73,8 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  Timer? _timer;
+
   int _selectedIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isExpanded = false;
@@ -78,6 +83,9 @@ class _HomepageState extends State<Homepage> {
   bool _isExpandedLocation  = false;
   bool _isExpandedAccount = false;
 
+  bool _isLoading = false;
+  String nickname = '';
+  String photoUrl = '';
   late GoogleMapController mapController;
   LatLng _currentPosition = LatLng(0, 0);
   String _currentAddress = "Searching...";
@@ -163,10 +171,56 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
+  Future<void> fetchProfileData() async {
+
+    setState(() {
+      _isLoading = true;
+    });
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString(
+      'token',
+    );
+    final Uri uri =
+    Uri.parse(getProfile);
+    final Map<String, String> headers = {'Authorization': 'Bearer $token'};
+    final response = await http.get(uri, headers: headers);
+
+    setState(() {
+      _isLoading =
+      false; // Set loading state to false after registration completes
+    });
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+
+      setState(() {
+        nickname= jsonData['user']['name'];
+        // userEmail = jsonData['user']['email'];
+        // contact = jsonData['user']['contact'].toString();
+        // address = jsonData['user']['bio'];
+        photoUrl = jsonData['user']['picture_data'];
+      });
+    } else {
+      throw Exception('Failed to load profile data');
+    }
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 2), (timer) {
+      _refresh();
+    });
+  }
+
+  void _refresh() {
+    setState(() {
+      fetchProfileData();
+    });
+  }
   @override
   void initState() {
     super.initState();
+    _startTimer();
     _getLocation(context);
+    fetchProfileData();
 
     _getCurrentLocation().then((_) {
       // Once the current location is obtained, update the initial camera position
@@ -467,12 +521,13 @@ class _HomepageState extends State<Homepage> {
                       },
                       child: CircleAvatar(
                         radius: 30, // Adjust the radius as needed
-                        backgroundImage: AssetImage(
-                            'assets/images/icons/profile.png'), // Provide your image path
+                        backgroundImage: (photoUrl.isNotEmpty)?
+                        NetworkImage(photoUrl): NetworkImage('https://icons.veryicon.com/png/o/internet--web/prejudice/user-128.png')
+                       // Provide your image path
                       ),
                     ),
                     title: Text(
-                      "Hi, James Charley!",
+                      "Hi, ${nickname}!",
                       style: GoogleFonts.radioCanada(
                         // Replace with your desired Google Font
                         textStyle: TextStyle(

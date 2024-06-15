@@ -18,16 +18,16 @@ import 'package:http/http.dart' as http;
 
 import 'package:url_launcher/url_launcher_string.dart';
 
-class ApartmentListing extends StatefulWidget {
-  final String backButton;
+class LocalityProperty extends StatefulWidget {
+  final String localityCity;
 
-  const ApartmentListing({super.key, required this.backButton});
+  const LocalityProperty({super.key, required this.localityCity});
 
   @override
-  State<ApartmentListing> createState() => _ApartmentListingState();
+  State<LocalityProperty> createState() => _ApartmentListingState();
 }
 
-class _ApartmentListingState extends State<ApartmentListing> {
+class _ApartmentListingState extends State<LocalityProperty> {
 
   bool isLoading = true;
   List<dynamic> allProperty = [];
@@ -53,9 +53,9 @@ class _ApartmentListingState extends State<ApartmentListing> {
   }
 
   Future<void> allPropertyapi() async {
-    final response = await http.get(Uri.parse(allPropertys));
+    final response = await http.get(Uri.parse('${propertiesByLocality}${widget.localityCity}'));
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body)['data'];
+      final data = jsonDecode(response.body)['properties'];
       setState(() {
         allProperty = data;
         isLoading = false;
@@ -76,13 +76,12 @@ class _ApartmentListingState extends State<ApartmentListing> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            if (widget.backButton == 'back')
               Padding(
                 padding: EdgeInsets.only(bottom: 8.sp),
                 child: AppBar(
                   backgroundColor: Colors.white,
                   title: Text(
-                    'All Property ',
+                    '${widget.localityCity}',
                     style: TextStyle(color: Colors.black),
                   ),
                 ),
@@ -233,7 +232,7 @@ class _ApartmentListingState extends State<ApartmentListing> {
                               padding: const EdgeInsets.only(top: 5.0),
                               child: Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     '₹ ',
@@ -279,7 +278,7 @@ class _ApartmentListingState extends State<ApartmentListing> {
                               padding: EdgeInsets.only(top: 8.sp),
                               child: Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   GestureDetector(
                                     onTap: () {},
@@ -289,7 +288,7 @@ class _ApartmentListingState extends State<ApartmentListing> {
                                         color: Colors.white,
 
                                         borderRadius:
-                                            BorderRadius.circular(10.sp),
+                                        BorderRadius.circular(10.sp),
                                         // Border radius for rounded corners
                                       ),
                                       child: Padding(
@@ -310,9 +309,9 @@ class _ApartmentListingState extends State<ApartmentListing> {
                                                 style: GoogleFonts.poppins(
                                                   textStyle: TextStyle(
                                                       fontSize:
-                                                          TextSizes.textsmall,
+                                                      TextSizes.textsmall,
                                                       fontWeight:
-                                                          FontWeight.normal,
+                                                      FontWeight.normal,
                                                       color: Colors.black),
                                                 ),
                                               ),
@@ -335,7 +334,7 @@ class _ApartmentListingState extends State<ApartmentListing> {
                                         color: Colors.white,
 
                                         borderRadius:
-                                            BorderRadius.circular(10.sp),
+                                        BorderRadius.circular(10.sp),
                                         // Border radius for rounded corners
                                       ),
                                       child: Padding(
@@ -356,9 +355,9 @@ class _ApartmentListingState extends State<ApartmentListing> {
                                                 style: GoogleFonts.poppins(
                                                   textStyle: TextStyle(
                                                       fontSize:
-                                                          TextSizes.textsmall,
+                                                      TextSizes.textsmall,
                                                       fontWeight:
-                                                          FontWeight.normal,
+                                                      FontWeight.normal,
                                                       color: Colors.black),
                                                 ),
                                               ),
@@ -380,7 +379,7 @@ class _ApartmentListingState extends State<ApartmentListing> {
                                         color: Colors.white,
 
                                         borderRadius:
-                                            BorderRadius.circular(10.sp),
+                                        BorderRadius.circular(10.sp),
                                         // Border radius for rounded corners
                                       ),
                                       height: 40.sp,
@@ -402,9 +401,9 @@ class _ApartmentListingState extends State<ApartmentListing> {
                                                 style: GoogleFonts.poppins(
                                                   textStyle: TextStyle(
                                                       fontSize:
-                                                          TextSizes.textsmall,
+                                                      TextSizes.textsmall,
                                                       fontWeight:
-                                                          FontWeight.normal,
+                                                      FontWeight.normal,
                                                       color: Colors.black),
                                                 ),
                                               ),
@@ -419,10 +418,10 @@ class _ApartmentListingState extends State<ApartmentListing> {
                             ),
                             Padding(
                               padding:
-                                  EdgeInsets.only(top: 15.sp, bottom: 15.sp),
+                              EdgeInsets.only(top: 15.sp, bottom: 15.sp),
                               child: Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   Container(
                                     height: 40.sp,
@@ -430,7 +429,7 @@ class _ApartmentListingState extends State<ApartmentListing> {
                                       color: Colors.black,
 
                                       borderRadius:
-                                          BorderRadius.circular(10.sp),
+                                      BorderRadius.circular(10.sp),
                                       // Border radius for rounded corners
                                     ),
                                     child: Padding(
@@ -452,7 +451,7 @@ class _ApartmentListingState extends State<ApartmentListing> {
                                                         fontSize: TextSizes
                                                             .textsmall2,
                                                         fontWeight:
-                                                            FontWeight.normal,
+                                                        FontWeight.normal,
                                                         color: Colors.white),
                                                   ),
                                                 ),
@@ -473,7 +472,7 @@ class _ApartmentListingState extends State<ApartmentListing> {
                                         color: HexColor('#122636'),
 
                                         borderRadius:
-                                            BorderRadius.circular(10.sp),
+                                        BorderRadius.circular(10.sp),
                                         // Border radius for rounded corners
                                       ),
                                       height: 40.sp,
@@ -498,7 +497,7 @@ class _ApartmentListingState extends State<ApartmentListing> {
                                                           fontSize: TextSizes
                                                               .textsmall2,
                                                           fontWeight:
-                                                              FontWeight.normal,
+                                                          FontWeight.normal,
                                                           color: Colors.white),
                                                     ),
                                                   ),
