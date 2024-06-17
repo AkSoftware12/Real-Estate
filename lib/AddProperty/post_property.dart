@@ -575,6 +575,13 @@ class _PostPropertyState extends State<PostProperty> {
               Padding(
                 padding: const EdgeInsets.all(0.0),
                 child: Text(
+                  'Selected option: ${selectedPropertyId}',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(0.0),
+                child: Text(
                   'Selected option: ${lat} ${lng}',
                   style: TextStyle(color: Colors.black),
                 ),

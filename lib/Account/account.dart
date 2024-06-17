@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:realestate/FullScreenUserProfile/full_screen_user_profile.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
 import 'package:realestate/Profile%20Update/profile_update.dart';
 import 'package:realestate/Utils/textSize.dart';
@@ -76,6 +77,9 @@ class _AccountPageState extends State<AccountPage> {
     }
   }
 
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,41 +130,54 @@ class _AccountPageState extends State<AccountPage> {
                                   ),
                                 ],
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  height: 50.sp,
-                                  width: 50.sp,
-                                  decoration: BoxDecoration(
-                                    color: Colors.orange,
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 2,
-                                        blurRadius: 7,
-                                        offset: Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    child: Image.network(
-                                      photoUrl.toString(),
+                              child: GestureDetector(
+                                onTap: (){
 
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        // Return a default image widget here
-                                        return Container(
-                                          color: Colors.grey,
-                                          // Placeholder color
-                                          // You can customize the default image as needed
-                                          child: Icon(
-                                            Icons.image,
-                                            color: Colors.white,
-                                          ),
-                                        );
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) {
+                                        return FullScreenUserProfile(image: photoUrl,);
                                       },
+                                    ),
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    height: 50.sp,
+                                    width: 50.sp,
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange,
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 2,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      child: Image.network(
+                                        photoUrl.toString(),
+
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          // Return a default image widget here
+                                          return Container(
+                                            color: Colors.grey,
+                                            // Placeholder color
+                                            // You can customize the default image as needed
+                                            child: Icon(
+                                              Icons.image,
+                                              color: Colors.white,
+                                            ),
+                                          );
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ),

@@ -17,6 +17,9 @@ var forgotPassword = "${baseUrl}forgot-password";
 // var propertiesByLocality = "${baseUrl}propertiesByLocality";
 var verifyOtp = "${baseUrl}verifyOtp";
 var changePassword = "${baseUrl}changePassword";
+var residentialBanner = "${baseUrl}residential-banner";
+var commercialBanner = "${baseUrl}commercial-banner";
+var allLocality = "${baseUrl}all-locality";
 var propertiesByLocality = "${baseUrl}propertiesByLocality?district=";
 
 

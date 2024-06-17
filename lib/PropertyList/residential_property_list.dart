@@ -12,6 +12,7 @@ import 'package:realestate/All%20Property/all_property.dart';
 import 'package:realestate/ApiModel/ResidentialPropertyModel/residential_property_model.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
 import 'package:realestate/Property%20Deatils/property_deatils.dart';
+import 'package:realestate/PropertyLocality/property_locality.dart';
 import 'package:realestate/ResidentialAllProperty/residential_all_property.dart';
 import 'package:realestate/Utils/textSize.dart';
 import 'package:http/http.dart' as http;
@@ -30,22 +31,58 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
   var _dotPosition=0;
   bool isLoading = true;
   List<dynamic> allProperty = [];
+  List<dynamic> topLocality = [];
   List<dynamic> subcategory = [];
+  List<dynamic> banner = [];
 
 
-  final List<String> _images = [
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoz_5HDm5Raa-Imfc-OnNf-KXwzA2Ox3Zcp0nbFoEFtzCaY5mVg_V3Xpxc2ovY5FsmLOs&usqp=CAU',
-    'https://www.pngmart.com/files/15/Vector-Home-PNG-Photos.png',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDsWnStDcZz9gMZfigH_LesuQiplssDYUr5jYqV-f5DQ&s',
-    'https://5.imimg.com/data5/JS/DP/IQ/IOS-69757314/product-jpeg-500x500.png',
-  ];
+
 
   @override
   void initState() {
     super.initState();
     allPropertyapi();
     ResidentialCategory();
+    hitBanner();
+    topLocalityApi();
+
   }
+  Future<void> topLocalityApi() async {
+    final response = await http.get(Uri.parse(allLocality));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['locality'];
+      setState(() {
+        topLocality = data;
+        isLoading = false;
+      });
+    } else {
+      // Handle error
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> hitBanner() async {
+    final response = await http.get(Uri.parse(residentialBanner));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (responseData.containsKey('data')) {
+        setState(() {
+          // Assuming 'data' is a list, update apiData accordingly
+          banner = responseData['data'];
+          // restBanner=responseData['data']['banner_img'];
+          print(banner);
+
+          // await saveDataLocally(responseData['posts']);
+        });
+      } else {
+        throw Exception('Invalid API response: Missing "data" key');
+      }
+    }
+  }
+
   Future<void> allPropertyapi() async {
     final response = await http.get(Uri.parse(getAllResidentialProperties));
     if (response.statusCode == 200) {
@@ -135,7 +172,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                       ),
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 0,
                     ),
 
                     Column(
@@ -148,7 +185,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                             },
                             child: AspectRatio(
                               aspectRatio: 2.5,
-                              child: CarouselSlider(items:_images.map((item) =>
+                              child: CarouselSlider(items:banner.map((item) =>
                                   Padding(
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 5,
@@ -168,7 +205,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                                             0.99,
 
 
-                                        padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
+                                        padding: EdgeInsets.symmetric(horizontal: 0.0,vertical: 0.0),
                                         decoration: BoxDecoration(
                                           color: Colors.white,
                                           borderRadius:
@@ -180,8 +217,8 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
 
                                           },
                                           child: Image.network(
-                                            item,
-                                            fit: BoxFit.fill,
+                                            item['picture_urls'],
+                                            fit: BoxFit.cover,
                                           ),
                                         ),
                                       ),
@@ -220,7 +257,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                           ),
                           const SizedBox(height: 1),
                           DotsIndicator(
-                            dotsCount: _images.isEmpty?1:_images.length,
+                            dotsCount: banner.isEmpty?1:banner.length,
                             position: _dotPosition,
                             decorator: const DotsDecorator(
                               activeColor: Colors.orange,
@@ -1041,20 +1078,19 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                 ),
               ),
               SizedBox(
-                  height: 320,
+                  height: 280,
                   child: GridView.count(
                     physics: NeverScrollableScrollPhysics(),
                     // Disable scrolling
                     crossAxisCount: 2,
                     childAspectRatio: 1.5,
-
                     children: List.generate(
-                      4,
+                      topLocality.length,
                           (index) => Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: GestureDetector(
                           onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage(id: '',)),);
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> LocalityProperty(localityCity: topLocality[index]['property_district'],)),);
 
                           },
                           child: Container(
@@ -1092,7 +1128,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Dehradun",
+                                        '${topLocality[index]['property_district']}',
                                         style: GoogleFonts.poppins(
                                           textStyle: TextStyle(
                                               fontSize: 15.sp,
@@ -1103,18 +1139,18 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                                       SizedBox(
                                         height: 10.sp,
                                       ),
-                                      Text(
-                                        '${"₹ 5000"}${" - "}${"₹ 1000"}',
-                                        style: GoogleFonts.poppins(
-                                          textStyle: TextStyle(
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.normal,
-                                              color: Colors.white),
-                                        ),
-                                      ),
+                                      // Text(
+                                      //   '${"₹ 5000"}${" - "}${"₹ 1000"}',
+                                      //   style: GoogleFonts.poppins(
+                                      //     textStyle: TextStyle(
+                                      //         fontSize: 12.sp,
+                                      //         fontWeight: FontWeight.normal,
+                                      //         color: Colors.white),
+                                      //   ),
+                                      // ),
                                       SizedBox(height: 10.sp),
                                       Text(
-                                        '${"30+"}${"Flats For Sale"}',
+                                        '${"${topLocality[index]['property_count']}"} ${' '} ${"Flats For Sale"}',
                                         style: GoogleFonts.poppins(
                                           textStyle: TextStyle(
                                               fontSize: 12.sp,

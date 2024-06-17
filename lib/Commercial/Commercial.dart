@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,6 +25,9 @@ class CommercialScreen extends StatefulWidget {
 }
 
 class _CommercialScreenState extends State<CommercialScreen> {
+  var _dotPosition=0;
+  List<dynamic> banner = [];
+
   bool isLoading = true;
   List<dynamic> subcategory = [];
   List<PropertyTypeModel> property = [
@@ -61,7 +66,29 @@ class _CommercialScreenState extends State<CommercialScreen> {
     super.initState();
     CommercialCategory();
     allPropertyapi();
+    hitBanner();
   }
+
+  Future<void> hitBanner() async {
+    final response = await http.get(Uri.parse(commercialBanner));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (responseData.containsKey('data')) {
+        setState(() {
+          // Assuming 'data' is a list, update apiData accordingly
+          banner = responseData['data'];
+          // restBanner=responseData['data']['banner_img'];
+          print(banner);
+
+          // await saveDataLocally(responseData['posts']);
+        });
+      } else {
+        throw Exception('Invalid API response: Missing "data" key');
+      }
+    }
+  }
+
 
   Future<void> CommercialCategory() async {
     final response = await http.get(Uri.parse('${category}${'1'}'));
@@ -88,117 +115,155 @@ class _CommercialScreenState extends State<CommercialScreen> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(15.0),
+                padding:  EdgeInsets.all(0.sp),
                 child: Column(
                   children: [
-                    Container(
-                      width: double.infinity,
-                      height: 50.sp,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 7,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Flexible(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8.0),
-                              child: TextField(
-                                style: GoogleFonts.poppins(
-                                  textStyle: TextStyle(
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.normal,
-                                      color: Colors.black),
+                    Padding(
+                      padding:  EdgeInsets.all(15.sp),
+                      child: Container(
+                        width: double.infinity,
+                        height: 50.sp,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 2,
+                              blurRadius: 7,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                child: TextField(
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                        fontSize: 15.sp,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.black),
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: 'Search',
+                                    border: InputBorder.none,
+                                    prefixIcon:
+                                    Icon(Icons.search, color: Colors.black),
+                                  ),
+                                  textInputAction: TextInputAction.next,
+                                  // This sets the keyboard action to "Next"
+                                  onEditingComplete: () =>
+                                      FocusScope.of(context).nextFocus(),
                                 ),
-                                decoration: InputDecoration(
-                                  hintText: 'Search',
-                                  border: InputBorder.none,
-                                  prefixIcon:
-                                  Icon(Icons.search, color: Colors.black),
-                                ),
-                                textInputAction: TextInputAction.next,
-                                // This sets the keyboard action to "Next"
-                                onEditingComplete: () =>
-                                    FocusScope.of(context).nextFocus(),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 0,
                     ),
-                    // Container(
-                    //   width: double.infinity,
-                    //   height: 150.sp,
-                    //   decoration: BoxDecoration(
-                    //     color: Colors.white,
-                    //     borderRadius: BorderRadius.circular(10.0),
-                    //     // Rounded corners with radius 10
-                    //     boxShadow: [
-                    //       BoxShadow(
-                    //         color: Colors.grey.withOpacity(0.5),
-                    //         spreadRadius: 2,
-                    //         blurRadius: 7,
-                    //         offset: Offset(0, 3),
-                    //       ),
-                    //     ],
-                    //   ),
-                    //   child: Stack(
-                    //     children: [
-                    //       Container(
-                    //         decoration: BoxDecoration(
-                    //           image: DecorationImage(
-                    //             image: AssetImage(
-                    //                 "assets/customImages/bannerImg.png"),
-                    //             fit: BoxFit.cover,
-                    //           ),
-                    //           borderRadius: BorderRadius.circular(
-                    //               10.0), // Match the parent container's rounded corners
-                    //         ),
-                    //       ),
-                    //       Container(
-                    //         padding: EdgeInsets.all(16.sp),
-                    //         child: Column(
-                    //           crossAxisAlignment: CrossAxisAlignment.start,
-                    //           children: [
-                    //             Text(
-                    //               "Real Estate Solutions",
-                    //               style: GoogleFonts.poppins(
-                    //                 textStyle: TextStyle(
-                    //                     fontSize: 15.sp,
-                    //                     fontWeight: FontWeight.bold,
-                    //                     color: Colors.white),
-                    //               ),
-                    //             ),
-                    //             SizedBox(
-                    //               height: 15.sp,
-                    //             ),
-                    //             Text(
-                    //               "We are here to \n providing best deal \n on properties.",
-                    //               style: GoogleFonts.poppins(
-                    //                 textStyle: TextStyle(
-                    //                     fontSize: 12.sp,
-                    //                     fontWeight: FontWeight.normal,
-                    //                     color: Colors.white),
-                    //               ),
-                    //             ),
-                    //             SizedBox(height: 20.sp),
-                    //           ],
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
+                    Column(
+                        children: [
+                          GestureDetector(
+                            onTap: (){
+
+
+
+                            },
+                            child: AspectRatio(
+                              aspectRatio: 2.5,
+                              child: CarouselSlider(items:banner.map((item) =>
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 5,
+                                        vertical: 10),
+                                    child: Material(
+                                      elevation: 5,
+                                      borderRadius:
+                                      BorderRadius.circular(
+                                          8.0),
+                                      clipBehavior: Clip.hardEdge,
+                                      child: Container(
+                                        height:  150.sp,
+                                        width:
+                                        MediaQuery.of(context)
+                                            .size
+                                            .width *
+                                            0.99,
+
+
+                                        padding: EdgeInsets.symmetric(horizontal: 0.0,vertical: 0.0),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                          BorderRadius.circular(
+                                              5.0),
+                                        ),
+                                        child: GestureDetector(
+                                          onTap: (){
+
+                                          },
+                                          child: Image.network(
+                                            item['picture_urls'],
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                //     Container(
+                                //   decoration: BoxDecoration(
+                                //       borderRadius:
+                                //       BorderRadius.circular(
+                                //           20.0),
+                                //       image: DecorationImage(image: NetworkImage( imageBaseUrl +
+                                //           item['banner_img']),fit:BoxFit.fitWidth)
+                                //   ),
+                                // )
+                              ).toList(),options: CarouselOptions(
+                                  height:  150.sp,
+                                  aspectRatio: 2/1,
+                                  viewportFraction: 0.95,
+                                  initialPage: 0,
+                                  enableInfiniteScroll: true,
+                                  reverse: false,
+                                  autoPlay: true,
+                                  autoPlayInterval: const Duration(seconds: 3),
+                                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                                  autoPlayCurve: Curves.fastOutSlowIn,
+                                  enlargeCenterPage: false,
+                                  enlargeFactor: 0.3,
+                                  onPageChanged: (val,carouselPageChangedReason) {
+                                    setState(() {
+                                      _dotPosition = val;
+                                    },);
+                                  }
+
+                              )),
+                            ),
+                          ),
+                          const SizedBox(height: 1),
+                          DotsIndicator(
+                            dotsCount: banner.isEmpty?1:banner.length,
+                            position: _dotPosition,
+                            decorator: const DotsDecorator(
+                              activeColor: Colors.orange,
+                              color: Colors.blueGrey,
+                              spacing: EdgeInsets.all(2),
+                              activeSize: Size(8, 8),
+                              size: Size(6, 6),
+                            ),
+                          ),
+                        ]
+
+
+                    ),
+
                   ],
                 ),
               ),

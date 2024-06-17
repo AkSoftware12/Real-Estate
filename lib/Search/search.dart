@@ -1,11 +1,36 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/All%20Property/all_property.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
 import 'package:realestate/Utils/textSize.dart';
+import 'package:http/http.dart' as http;
+
+import 'dart:async';
+import 'dart:math';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geocoder2/geocoder2.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_api_headers/google_api_headers.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/directions.dart';
+import 'package:google_maps_webservice/places.dart';
+import 'package:realestate/ApiModel/latlng.dart';
+import 'package:realestate/Components/custom_appbar.dart';
+import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
+import 'package:realestate/Themes/constantfile.dart';
+import 'package:realestate/baseurl/baseurl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class SearchScreen extends StatefulWidget {
   final String backButton;
@@ -23,6 +48,57 @@ class _PropertySearchScreenState extends State<SearchScreen> {
   double start = 5000.0;
   double end = 50000.0;
 
+  bool button = false;
+  dynamic lat;
+  dynamic lng;
+
+  String selectedCategory = '2';
+  List<dynamic> subcategory = [];
+  List<dynamic> commercialcategory = [];
+  int selectedPropertyIndex = -1;
+  int selectedPropertyComIndex = -1;
+  int? selectedPropertyId;
+  int? selectedPropertyComId;
+  var currentAddress = '';
+  bool isLoading = true;
+
+
+
+  Future<void> ResidentialCategory() async {
+    final response = await http.get(Uri.parse('${category}${'2'}'));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['subcategory'];
+      setState(() {
+        subcategory = data;
+        isLoading = false;
+      });
+    } else {
+      // Handle error
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+  Future<void> CommercialCategory() async {
+    final response = await http.get(Uri.parse('${category}${'1'}'));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['subcategory'];
+      setState(() {
+        commercialcategory = data;
+        isLoading = false;
+      });
+    } else {
+      // Handle error
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+
+  Completer<GoogleMapController> _controller = Completer();
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+
   List<bool> _isSelected = [true, false, false];
 
   void _handleToggleButton(int index) {
@@ -37,13 +113,128 @@ class _PropertySearchScreenState extends State<SearchScreen> {
 
   void _handleToggleButtonPro(int index) {
     setState(() {
-      for (int i = 0; i < _isSelectedPro.length; i++) {
-        _isSelectedPro[i] = i == index;
+      for (int buttonIndex = 0;
+      buttonIndex < _isSelectedPro.length;
+      buttonIndex++) {
+        if (buttonIndex == index) {
+          _isSelectedPro[buttonIndex] = true;
+          // Perform your action based on the selected button
+          if (index == 0) {
+            selectedCategory = ('2');
+          } else if (index == 1) {
+            selectedCategory = ('1');
+          }
+        } else {
+          _isSelectedPro[buttonIndex] = false;
+        }
       }
     });
   }
+
+
+  void getPlaces(context) async {
+    // PlacesAutocomplete.show(
+    //   context: context,
+    //   apiKey: apiKey,
+    //   mode: Mode.fullscreen,
+    //   onError: (response) {
+    //     print(response.predictions);
+    //   },
+    //   language: "en",
+    //     components: [new Component(Component.country, "in")]
+    // ).then((value) {
+    //   //displayPrediction(value);
+    // }).catchError((e) {
+    //   print(e);
+    // });
+
+    setState(() {
+      button = false;
+    });
+
+    final Prediction? p = await PlacesAutocomplete.show(
+      context: context,
+      apiKey: apiKey,
+      onError: onError,
+      mode: Mode.overlay, // or Mode.fullscreen
+      language: 'en',
+      components: [Component(Component.country, 'in')],
+    );
+
+    if (p != null) displayPrediction(p);
+  }
+
+  void onError(PlacesAutocompleteResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(response.errorMessage ?? 'Unknown error'),
+      ),
+    );
+  }
+
+  Future<Null> displayPrediction(Prediction p) async {
+    GoogleMapsPlaces _places = GoogleMapsPlaces(
+      apiKey: apiKey,
+      apiHeaders: await GoogleApiHeaders().getHeaders(),
+    );
+    PlacesDetailsResponse detail =
+    await _places.getDetailsByPlaceId(p.placeId!);
+    final lat = detail.result.geometry!.location.lat;
+    final lng = detail.result.geometry!.location.lng;
+    _getCameraMoveLocation(LatLng(lat, lng));
+    print("${p.description} - $lat/$lng");
+
+    final marker = Marker(
+      markerId: MarkerId('location'),
+      position: LatLng(lat, lng),
+      icon: BitmapDescriptor.defaultMarker,
+    );
+    setState(() {
+      markers[MarkerId('location')] = marker;
+      _goToTheLake(lat, lng);
+    });
+
+
+
+  }
+  void _getCameraMoveLocation(LatLng data) async {
+    Timer(Duration(seconds: 1), () async {
+      lat = data.latitude;
+      lng = data.longitude;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("lat", data.latitude.toStringAsFixed(8));
+      prefs.setString("lng", data.longitude.toStringAsFixed(8));
+      GeoData data1 = await Geocoder2.getDataFromCoordinates(
+          latitude: lat,
+          longitude: lng,
+          googleMapApiKey: apiKey);
+      setState(() {
+        currentAddress = data1.address;
+        button = true;
+      });
+    });
+  }
+  Future<void> _goToTheLake(lat, lng) async {
+    final CameraPosition _kLake = CameraPosition(
+        target: LatLng(lat, lng),
+        zoom: 14.151926040649414);
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
+
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    ResidentialCategory();
+    CommercialCategory();
+
+  }
+
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor:  Colors.white,
 
@@ -59,6 +250,8 @@ class _PropertySearchScreenState extends State<SearchScreen> {
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+
             children: [
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -115,59 +308,99 @@ class _PropertySearchScreenState extends State<SearchScreen> {
                   ],
                 ),
               ),
+
               Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  width: double.infinity,
-                  height: 50.sp,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 2,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Flexible(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0),
-                          child: TextField(
-                            style: GoogleFonts.poppins(
-                              textStyle: TextStyle(
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.black),
-                            ),
-                            decoration: const InputDecoration(
-                              hintText: 'eg.Dehradun,Uttarakhand',
-                              border: InputBorder.none,
-                              prefixIcon:
-                              Icon(Icons.search, color: Colors.black),
-                            ),
-                            textInputAction: TextInputAction.next,
-                            // This sets the keyboard action to "Next"
-                            onEditingComplete: () =>
-                                FocusScope.of(context).nextFocus(),
+                padding: const EdgeInsets.only(left: 16.0,right: 16,top: 16),
+                child: GestureDetector(
+                  onTap: (){
+                    getPlaces(context);
+
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 50.sp,
+                    padding: EdgeInsets.only(left: 15),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 7,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.search,size: 25,color: Colors.black,),
+                        SizedBox(width: 20,),
+                        Text(
+                          'Enter Location',
+                          style: TextStyle(
+                              color: Colors.black
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+
+
+              if(currentAddress.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child:   Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(30.sp)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(14.0),
+                            child: Icon(
+                              Icons.location_on,
+                              color: Colors.black,
+                              size: 20.sp,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                              left: 5.sp, bottom: 1.sp, top: 5.sp),
+                          child: Container(
+                            width: screenWidth * 0.7, // 80% of screen width
+                            child: Text(
+                              currentAddress,
+                              maxLines: 4,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.poppins(
+                                textStyle: TextStyle(
+                                  fontSize: TextSizes.textsmall,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+
+                ),
+              SizedBox(height: 5),
               Padding(
                 padding:  EdgeInsets.only(top: 18.sp,left: 15.sp),
                 child: Row(
                   children: [
                     Text(
-                      "Property Type",
+                      "Property Category",
                       style: GoogleFonts.poppins(
                         textStyle: TextStyle(
                             fontSize: 18.sp,
@@ -185,7 +418,7 @@ class _PropertySearchScreenState extends State<SearchScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Padding(
-                      padding:  EdgeInsets.only(left: 18.sp),
+                      padding:  EdgeInsets.only(left: 15.sp),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -201,17 +434,16 @@ class _PropertySearchScreenState extends State<SearchScreen> {
 
                             children: <Widget>[
                               Padding(
-                                padding: const EdgeInsets.all(16.0),
+                                padding: const EdgeInsets.all(0.0),
                                 child: Container(
                                   width: 100.sp,
                                   child: Center(
                                     child: Row(
                                       children: [
-                                        Icon(Icons.home_outlined),
                                         SizedBox(width: 5.sp),
                                         Center(
                                           child: Text(
-                                            'Flats',
+                                            ' Residential',
                                             style: GoogleFonts.poppins(
                                               textStyle: TextStyle(
                                                 fontSize: TextSizes.textsmall,
@@ -226,17 +458,16 @@ class _PropertySearchScreenState extends State<SearchScreen> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(16.0),
+                                padding: const EdgeInsets.all(0.0),
                                 child: Container(
                                   width: 100.sp,
                                   child: Center(
                                     child: Row(
                                       children: [
-                                        Icon(Icons.home_outlined),
                                         SizedBox(width: 5.sp),
                                         Center(
                                           child: Text(
-                                            'House',
+                                            'Commercial',
                                             style: GoogleFonts.poppins(
                                               textStyle: TextStyle(
                                                 fontSize: TextSizes.textsmall,
@@ -263,53 +494,132 @@ class _PropertySearchScreenState extends State<SearchScreen> {
                 ),
               ),
 
+
+
               SizedBox(height: 20),
+              // 2
               Padding(
-                padding:  EdgeInsets.only(top: 18.sp,left: 15.sp),
+                padding: EdgeInsets.only(top: 10.sp, left: 15.sp),
                 child: Row(
                   children: [
                     Text(
-                      "Bedrooms",
-                      style: GoogleFonts.poppins(
+                      "Property Type",
+                      style: GoogleFonts.radioCanada(
                         textStyle: TextStyle(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
+                          color: Colors.black,
+                          fontSize: TextSizes.textmedium,
+                          // Adjust font size as needed
+                          fontWeight:
+                          FontWeight.bold, // Adjust font weight as needed
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
 
-              Wrap(
-                spacing: 10.0,
-                children: List<Widget>.generate(6, (int index) {
-                  return  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ChoiceChip(
-                      label: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          '${index + 1} Bhk',
-                          style: TextStyle(
-                            color: selectedBedroom == '${index + 1} Bhk' ? Colors.white : Colors.black, // Change text color based on selection
+
+              if(selectedCategory=='2')
+              Padding(
+                padding:  EdgeInsets.only(left: 10.sp,top: 10.sp),
+                child: Wrap(
+                  spacing: 10.0,
+                  children:
+                  List<Widget>.generate(subcategory.length, (int index) {
+                    return SizedBox(
+                      height: 50.sp,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: ChoiceChip(
+                          label: Padding(
+                            padding: const EdgeInsets.all(0.0),
+                            child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Text(
+                                subcategory[index]['name'],
+                                style: TextStyle(
+                                  color: selectedPropertyIndex == index
+                                      ? Colors.white
+                                      : Colors
+                                      .black, // Change text color based on selection
+                                ),
+                              ),
+                            ),
                           ),
+                          selected: selectedPropertyIndex == index,
+                          selectedColor: HexColor('#122636'),
+                          // Change to your desired selected color
+                          checkmarkColor: Colors.white,
+                          onSelected: (bool selected) {
+                            setState(() {
+                              selectedPropertyId = selected
+                                  ? subcategory[index]['id']
+                                  : subcategory[0]['id'];
+                              selectedPropertyIndex = selected ? index : -1;
+                            });
+                          },
                         ),
                       ),
-                      selected: selectedBedroom == '${index + 1} Bhk',
-                      selectedColor: HexColor('#122636'),// Change to your desired selected color
-                    checkmarkColor: Colors.white,
-                      onSelected: (bool selected) {
-                        setState(() {
-                          selectedBedroom = '${index + 1} Bhk';
-                        });
-                      },
-                    )
-
-                  );
-                }).toList(),
+                    );
+                  }).toList(),
+                ),
               ),
-              SizedBox(height: 20),
+
+              if(selectedCategory=='1')
+                Padding(
+                  padding:  EdgeInsets.only(left: 10.sp,top: 10.sp),
+                  child: Wrap(
+                    spacing: 10.0,
+                    children:
+                    List<Widget>.generate(commercialcategory.length, (int index) {
+                      return SizedBox(
+                        height: 50.sp,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: ChoiceChip(
+                            label: Padding(
+                              padding: const EdgeInsets.all(0.0),
+                              child: Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  commercialcategory[index]['name'],
+                                  style: TextStyle(
+                                    color: selectedPropertyComIndex == index
+                                        ? Colors.white
+                                        : Colors
+                                        .black, // Change text color based on selection
+                                  ),
+                                ),
+                              ),
+                            ),
+                            selected: selectedPropertyComIndex == index,
+                            selectedColor: HexColor('#122636'),
+                            // Change to your desired selected color
+                            checkmarkColor: Colors.white,
+                            onSelected: (bool selected) {
+                              setState(() {
+                                selectedPropertyComId = selected
+                                    ? commercialcategory[index]['id']
+                                    : commercialcategory[0]['id'];
+                                selectedPropertyComIndex = selected ? index : -1;
+
+                              });
+                            },
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+
+              Text(selectedPropertyComId.toString(),style: TextStyle(
+                color: Colors.black
+              ),),
+              // 2
+              Text(selectedPropertyId.toString(),style: TextStyle(
+                  color: Colors.black
+              ),),
+              SizedBox(height: 40),
               Padding(
                 padding:  EdgeInsets.only(left: 20.sp,right: 20.sp),
                 child: Row(
