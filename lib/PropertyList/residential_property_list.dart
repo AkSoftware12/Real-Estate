@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/All%20Property/all_property.dart';
 import 'package:realestate/ApiModel/ResidentialPropertyModel/residential_property_model.dart';
@@ -17,26 +18,54 @@ import 'package:realestate/ResidentialAllProperty/residential_all_property.dart'
 import 'package:realestate/Utils/textSize.dart';
 import 'package:http/http.dart' as http;
 import 'package:realestate/baseurl/baseurl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ResidentialScreen extends StatefulWidget {
+  final String lat;
+  final String lag;
 
 
-  ResidentialScreen({super.key});
+  ResidentialScreen({super.key, required this.lat, required this.lag});
 
   @override
   State<ResidentialScreen> createState() => _ResidentialScreenState();
 }
 
 class _ResidentialScreenState extends State<ResidentialScreen> {
-  var _dotPosition=0;
+  int _dotPosition = 0;
+
+
   bool isLoading = true;
   List<dynamic> allProperty = [];
+  List<dynamic> nearByProperty = [];
   List<dynamic> topLocality = [];
   List<dynamic> subcategory = [];
   List<dynamic> banner = [];
 
 
 
+  _getDirection(url) async {
+    try {
+      launch(url);
+    } catch (error, stack) {
+      // log error
+    }
+  }
+
+  _launchURL(url) async {
+    try {
+      launch(url);
+    } catch (error, stack) {
+      // log error
+    }
+  }
+  void _refresh() {
+    setState(() {
+      nearByPropertyapi();
+
+    });
+  }
 
   @override
   void initState() {
@@ -45,6 +74,9 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
     ResidentialCategory();
     hitBanner();
     topLocalityApi();
+    nearByPropertyapi();
+    print(widget.lat);
+    print(widget.lag);
 
   }
   Future<void> topLocalityApi() async {
@@ -114,8 +146,58 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
     }
   }
 
+  Future<void> nearByPropertyapi() async {
+
+
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString('token');
+    final response = await http.post(
+      Uri.parse(nearBy),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'latitude': widget.lat,
+        'longitude': widget.lag,
+
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      if (responseData.containsKey('properties')) {
+        setState(() {
+          // Assuming 'properties' is a list, update allProperty accordingly
+          nearByProperty = responseData['properties'];
+          print(allProperty);
+        });
+      } else {
+        // Print the entire response for debugging
+        print('Invalid API response: Missing "properties" key');
+        print(responseData);
+        throw Exception('Invalid API response: Missing "properties" key');
+      }
+    } else {
+      // Handle error
+      print('Error: ${response.statusCode}');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
+
+    int dotsCount = nearByProperty.isEmpty ? 1 : nearByProperty.length;
+
+    // Ensure _dotPosition is within the valid range
+    if (_dotPosition >= dotsCount) {
+      _dotPosition = dotsCount - 1;
+    }
     return   SingleChildScrollView(
       child: Container(
           width: double.infinity, // Take full width of the screen
@@ -717,9 +799,505 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
             ),
           ),
         ),
-
-
               // All Property
+
+
+              if(nearByProperty.isNotEmpty)
+              Container(
+                color: Colors.white,
+                child:  Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              'Near By Properties',
+                              style: GoogleFonts.poppins(
+                                textStyle: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
+                              ),
+                            ),
+                            Spacer(),
+                            GestureDetector(
+                              onTap: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=> ApartmentListing(backButton: 'back',)),);
+
+                              },
+                              child: Text(
+                                'View all',
+                                style: GoogleFonts.poppins(
+                                  textStyle: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.normal,
+                                    color: HexColor('#9ba3aa'),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      GestureDetector(
+                        onTap: (){
+
+                        },
+                        child: AspectRatio(
+                          aspectRatio: .96,
+                          child: CarouselSlider(items:nearByProperty.map((item) =>
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 5,
+                                    vertical: 10),
+                                child: Material(
+                                  elevation: 5,
+                                  borderRadius:
+                                  BorderRadius.circular(
+                                      8.0),
+                                  clipBehavior: Clip.hardEdge,
+                                  child: Container(
+                                    height: double.infinity,
+                                    width:
+                                    MediaQuery.of(context)
+                                        .size
+                                        .width *
+                                        0.99,
+
+                                    // padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius:
+                                      BorderRadius.circular(
+                                          5.0),
+                                    ),
+                                    child:GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => PropertyDeatilsPage(id: item['id'].toString()),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: HexColor('#f6f6f7'),
+                                          borderRadius: BorderRadius.circular(5.0),
+                                        ),
+                                        margin: EdgeInsets.all(2.0),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                height: 160.sp,
+                                                width: double.infinity,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(5.0),
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(8.0),
+                                                  child: SizedBox(
+                                                      height: 160.sp,
+                                                      width: double.infinity,
+                                                      child: ClipRRect(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                        child:CachedNetworkImage(
+                                                          height: 160.sp,
+                                                          imageUrl: item['picture_urls'][0],
+                                                          // imageUrl:  nearByProperty[0]['picture_urls'][0].toString(),
+                                                          fit: BoxFit.cover, // Adjust this according to your requirement
+                                                          placeholder: (context, url) => const Center(
+                                                            child: CircularProgressIndicator(
+                                                              color: Colors.orangeAccent,
+                                                            ),
+                                                          ),
+                                                          errorWidget: (context, url, error) => Image.asset(
+                                                            'assets/no_image.jpg', // Path to your default image asset
+                                                            height: 90.sp, // Adjust width as per your requirement
+                                                            fit: BoxFit.cover, // Adjust this according to your requirement
+                                                          ),
+                                                        ),
+                                                      )),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 5.0),
+                                                child: Row(
+                                                  children: [
+                                                    Text(
+                                                      '${item['property_name'].toString()}',
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: GoogleFonts.poppins(
+                                                        textStyle: TextStyle(
+                                                            fontSize: 12.sp,
+                                                            fontWeight: FontWeight.bold,
+                                                            color: Colors.black),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 5.0),
+                                                child: Row(
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.location_on,
+                                                          size: 13.sp,
+                                                          color: Colors.red,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Text(
+                                                      '${item['property_address'].toString()}',
+                                                      maxLines: 1,
+                                                      style: GoogleFonts.poppins(
+                                                        textStyle: TextStyle(
+                                                          fontSize: 11.sp,
+                                                          fontWeight: FontWeight.normal,
+                                                          color: HexColor('#9ba3aa'),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 5.0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      '₹ ',
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: GoogleFonts.poppins(
+                                                        textStyle: TextStyle(
+                                                            fontSize: 14.sp,
+                                                            fontWeight: FontWeight.bold,
+                                                            color: Colors.black),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '${item['property_price'].toString()}',
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: GoogleFonts.poppins(
+                                                        textStyle: TextStyle(
+                                                            fontSize: 14.sp,
+                                                            fontWeight: FontWeight.bold,
+                                                            color: Colors.black),
+                                                      ),
+                                                    ),
+                                                    Spacer(),
+                                                    Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.star,
+                                                          color: Colors.orange,
+                                                          size: 15.sp,
+                                                        ),
+                                                        SizedBox(width: 4),
+                                                        Text(
+                                                          '4.5',
+                                                          style: TextStyle(color: Colors.black),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.only(top: 8.sp),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTap: () {},
+                                                      child: Container(
+                                                        height: 40.sp,
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.white,
+
+                                                          borderRadius:
+                                                          BorderRadius.circular(10.sp),
+                                                          // Border radius for rounded corners
+                                                        ),
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Row(
+                                                            children: [
+                                                              SvgPicture.asset(
+                                                                'assets/bed_solid.svg',
+                                                                width: 15.sp,
+                                                                height: 12.sp,
+                                                              ),
+                                                              SizedBox(
+                                                                width: 5.sp,
+                                                              ),
+                                                              Center(
+                                                                child: Text(
+                                                                  ' Furnished',
+                                                                  style: GoogleFonts.poppins(
+                                                                    textStyle: TextStyle(
+                                                                        fontSize:
+                                                                        TextSizes.textsmall,
+                                                                        fontWeight:
+                                                                        FontWeight.normal,
+                                                                        color: Colors.black),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 5.sp,
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: (){
+
+                                                      },
+                                                      child: Container(
+                                                        height: 40.sp,
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.white,
+
+                                                          borderRadius:
+                                                          BorderRadius.circular(10.sp),
+                                                          // Border radius for rounded corners
+                                                        ),
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Row(
+                                                            children: [
+                                                              SvgPicture.asset(
+                                                                'assets/car_solid.svg',
+                                                                width: 15.sp,
+                                                                height: 12.sp,
+                                                              ),
+                                                              SizedBox(
+                                                                width: 5.sp,
+                                                              ),
+                                                              Center(
+                                                                child: Text(
+                                                                  ' Car Parking',
+                                                                  style: GoogleFonts.poppins(
+                                                                    textStyle: TextStyle(
+                                                                        fontSize:
+                                                                        TextSizes.textsmall,
+                                                                        fontWeight:
+                                                                        FontWeight.normal,
+                                                                        color: Colors.black),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 5.sp,
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap:(){
+
+                                                      },
+                                                      child: Container(
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.white,
+
+                                                          borderRadius:
+                                                          BorderRadius.circular(10.sp),
+                                                          // Border radius for rounded corners
+                                                        ),
+                                                        height: 40.sp,
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Row(
+                                                            children: [
+                                                              SvgPicture.asset(
+                                                                'assets/people_group_solid.svg',
+                                                                width: 15.sp,
+                                                                height: 12.sp,
+                                                              ),
+                                                              SizedBox(
+                                                                width: 5.sp,
+                                                              ),
+                                                              Center(
+                                                                child: Text(
+                                                                  ' For Family',
+                                                                  style: GoogleFonts.poppins(
+                                                                    textStyle: TextStyle(
+                                                                        fontSize:
+                                                                        TextSizes.textsmall,
+                                                                        fontWeight:
+                                                                        FontWeight.normal,
+                                                                        color: Colors.black),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                EdgeInsets.only(top: 15.sp, bottom: 15.sp),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Container(
+                                                      height: 40.sp,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.black,
+
+                                                        borderRadius:
+                                                        BorderRadius.circular(10.sp),
+                                                        // Border radius for rounded corners
+                                                      ),
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.all(8.0),
+                                                        child: GestureDetector(
+                                                          onTap: () {
+                                                            _launchURL("tel://${item['owner_contact'].toString()}");
+                                                          },
+                                                          child: Row(
+                                                            children: [
+                                                              Center(
+                                                                child: Padding(
+                                                                  padding: EdgeInsets.only(
+                                                                      left: 25.sp, right: 25.sp),
+                                                                  child: Text(
+                                                                    ' Contact Agent',
+                                                                    style: GoogleFonts.poppins(
+                                                                      textStyle: TextStyle(
+                                                                          fontSize: TextSizes
+                                                                              .textsmall2,
+                                                                          fontWeight:
+                                                                          FontWeight.normal,
+                                                                          color: Colors.white),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        _getDirection(
+                                                            'https://www.google.com/maps/search/?api=1&query=${item['property_lat'].toString()},${item['property_long'].toString()}');
+                                                      },
+                                                      child: Container(
+                                                        decoration: BoxDecoration(
+                                                          color: HexColor('#122636'),
+
+                                                          borderRadius:
+                                                          BorderRadius.circular(10.sp),
+                                                          // Border radius for rounded corners
+                                                        ),
+                                                        height: 40.sp,
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: GestureDetector(
+                                                            onTap: () {
+                                                              _getDirection(
+                                                                  'https://www.google.com/maps/search/?api=1&query=${item['property_lat'].toString()},${item['property_long'].toString()}');
+                                                            },
+                                                            child: Row(
+                                                              children: [
+                                                                Center(
+                                                                  child: Padding(
+                                                                    padding: EdgeInsets.only(
+                                                                        left: 25.sp,
+                                                                        right: 25.sp),
+                                                                    child: Text(
+                                                                      'View Location',
+                                                                      style: GoogleFonts.poppins(
+                                                                        textStyle: TextStyle(
+                                                                            fontSize: TextSizes
+                                                                                .textsmall2,
+                                                                            fontWeight:
+                                                                            FontWeight.normal,
+                                                                            color: Colors.white),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            //     Container(
+                            //   decoration: BoxDecoration(
+                            //       borderRadius:
+                            //       BorderRadius.circular(
+                            //           20.0),
+                            //       image: DecorationImage(image: NetworkImage( imageBaseUrl +
+                            //           item['banner_img']),fit:BoxFit.fitWidth)
+                            //   ),
+                            // )
+                          ).toList(),options: CarouselOptions(
+                              height:double.infinity,
+                              aspectRatio: 2/1,
+                              viewportFraction: 0.99,
+                              initialPage: 0,
+                              enableInfiniteScroll: true,
+                              reverse: false,
+                              autoPlay: true,
+                              autoPlayInterval: const Duration(seconds: 3),
+                              autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                              autoPlayCurve: Curves.fastOutSlowIn,
+                              enlargeCenterPage: false,
+                              enlargeFactor: 0.3,
+                              onPageChanged: (val,carouselPageChangedReason) {
+                                setState(() {
+                                },);
+                              }
+
+                          )),
+                        ),
+                      ),
+                    ]
+
+
+                ),
+              ),
+
 
               Padding(
                 padding: const EdgeInsets.all(15.0),

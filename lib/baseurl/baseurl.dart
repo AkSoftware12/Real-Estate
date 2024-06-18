@@ -1,5 +1,5 @@
 // var baseUrl = "https://api.astropanditharidwar.in/api/";
-var baseUrl = "https://192.168.1.9/propertymanagement/api/";
+var baseUrl = "https://192.168.1.5/propertymanagement/api/";
 
 
 var register = "${baseUrl}signup";
@@ -20,6 +20,8 @@ var changePassword = "${baseUrl}changePassword";
 var residentialBanner = "${baseUrl}residential-banner";
 var commercialBanner = "${baseUrl}commercial-banner";
 var allLocality = "${baseUrl}all-locality";
+var searchForm = "${baseUrl}search-form";
+var nearBy = "${baseUrl}properties/nearby";
 var propertiesByLocality = "${baseUrl}propertiesByLocality?district=";
 
 

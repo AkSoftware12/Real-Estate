@@ -12,6 +12,10 @@ import 'package:realestate/PropertyList/residential_property_list.dart';
 
 
 class HomeScreen extends StatefulWidget {
+  final String lat;
+  final String lng;
+
+  const HomeScreen({super.key, required this.lat, required this.lng});
   @override
   State<HomeScreen> createState() => _HomeSectionState();
 }
@@ -109,7 +113,7 @@ class _HomeSectionState extends State<HomeScreen> with SingleTickerProviderState
         body: TabBarView(
           controller: _tabController,
           children: [
-            ResidentialScreen(),
+            ResidentialScreen(lat: widget.lat, lag: widget.lng,),
             CommercialScreen(),
           ],
         ),

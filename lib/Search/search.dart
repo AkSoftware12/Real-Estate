@@ -8,6 +8,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/All%20Property/all_property.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
+import 'package:realestate/SearchProperty/search_property.dart';
 import 'package:realestate/Utils/textSize.dart';
 import 'package:http/http.dart' as http;
 
@@ -46,7 +47,7 @@ class _PropertySearchScreenState extends State<SearchScreen> {
   int minBudget = 5000;
   int maxBudget = 7000;
   double start = 5000.0;
-  double end = 50000.0;
+  double end = 150000.0;
 
   bool button = false;
   dynamic lat;
@@ -684,7 +685,7 @@ class _PropertySearchScreenState extends State<SearchScreen> {
                           ),),
                         SizedBox(height: 10.sp,),
                         Container(
-                          width: 120.sp,
+                          width: 130.sp,
                           child: Card(
                             elevation: 4,
                             color: Colors.white,
@@ -731,7 +732,7 @@ class _PropertySearchScreenState extends State<SearchScreen> {
                         });
                       },
                       min: 2000.0,
-                      max: 50000.0,
+                      max: 500000.0,
                       activeColor: HexColor('#122636'),// Color of the active part of the slider
                       inactiveColor: Colors.grey, // Color of the inactive part of the slider
                     ),
@@ -762,7 +763,8 @@ class _PropertySearchScreenState extends State<SearchScreen> {
 
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => ApartmentListing(backButton: 'back')),
+                      MaterialPageRoute(builder: (context) => SearchProperty(category_id: selectedCategory,
+                        sub_category_id: selectedPropertyId.toString(), min_price: start.toStringAsFixed(2), max_price: end.toStringAsFixed(2), address: currentAddress, buyRentStatus: '0',)),
                     );
                   },
                 ),

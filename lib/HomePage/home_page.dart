@@ -60,13 +60,6 @@ List<Item> generateItems(int numberOfItems) {
 class Homepage extends StatefulWidget {
   Homepage({Key? key}) : super(key: key);
 
-  static List<Widget> _widgetOptions = <Widget>[
-    HomeScreen(),
-    ApartmentListing(backButton: '',),
-    SearchScreen(backButton: '',),
-    CityGrid(backButton: '',),
-    AccountPage(backButton: '',),
-  ];
 
   @override
   _HomepageState createState() => _HomepageState();
@@ -88,14 +81,23 @@ class _HomepageState extends State<Homepage> {
   String photoUrl = '';
   late GoogleMapController mapController;
   LatLng _currentPosition = LatLng(0, 0);
+  Position? currentLocation;
   String _currentAddress = "Searching...";
   String? cityName = 'Searching...';
+
+
+
+
 
 
   double userLat = 0.0;
   double userLng = 0.0;
   var lat = 30.3253;
   var lng = 78.0413;
+
+  double? lngCut = 0.0;
+  double? latCut = 0.0;
+
 
   final List<String> items = ['1 Bhk', '2 Bhk', '3 Bhk', '4 Bhk', '5 Bhk'];
   final List<String> project = ['Flats', 'Houses', 'Villas',];
@@ -104,6 +106,20 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  List<Widget> _widgetOptions() {
+    return <Widget>[
+      HomeScreen(
+        lat: latCut.toString(),
+        lng: lngCut.toString(),
+      ),
+      ApartmentListing(backButton: '',),
+      SearchScreen(backButton: '',),
+      CityGrid(backButton: '',),
+      AccountPage(backButton: '',),
+
+    ];
   }
 
 
@@ -267,6 +283,10 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       _currentPosition = LatLng(position.latitude, position.longitude);
       // _addMarker(_currentPosition);
+      currentLocation = position;
+      latCut = position.latitude;
+      lngCut = position.longitude;
+
     });
 
     _getAddressFromLatLng(_currentPosition);
@@ -1651,7 +1671,7 @@ class _HomepageState extends State<Homepage> {
           ),
         ),
       ),
-      body: Homepage._widgetOptions.elementAt(_selectedIndex),
+      body: _widgetOptions().elementAt(_selectedIndex),
 
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
