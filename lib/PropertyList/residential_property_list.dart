@@ -10,6 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/All%20Property/all_property.dart';
+import 'package:realestate/AllCommercialProperty/all_commercial_property.dart';
 import 'package:realestate/ApiModel/ResidentialPropertyModel/residential_property_model.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
 import 'package:realestate/Property%20Deatils/property_deatils.dart';
@@ -24,9 +25,10 @@ import 'package:url_launcher/url_launcher.dart';
 class ResidentialScreen extends StatefulWidget {
   final String lat;
   final String lag;
+  final String index;
 
 
-  ResidentialScreen({super.key, required this.lat, required this.lag});
+  ResidentialScreen({super.key, required this.lat, required this.lag, required this.index});
 
   @override
   State<ResidentialScreen> createState() => _ResidentialScreenState();
@@ -38,9 +40,12 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
 
   bool isLoading = true;
   List<dynamic> allProperty = [];
+  List<dynamic> allRecentlyProperty = [];
+  List<dynamic> residentialRecentlyProperty = [];
   List<dynamic> nearByProperty = [];
   List<dynamic> topLocality = [];
   List<dynamic> subcategory = [];
+  List<dynamic> allsubcategory = [];
   List<dynamic> banner = [];
 
 
@@ -71,7 +76,11 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
   void initState() {
     super.initState();
     allPropertyapi();
+    allCommercialapi();
     ResidentialCategory();
+    allRecentlyapi();
+    residentialRecentlyapi();
+    AllCategory();
     hitBanner();
     topLocalityApi();
     nearByPropertyapi();
@@ -130,12 +139,61 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
       });
     }
   }
+
+
+  Future<void> allRecentlyapi() async {
+    final response = await http.get(Uri.parse('${recentProperty}'));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['data'];
+      setState(() {
+        allRecentlyProperty = data;
+        isLoading = false;
+      });
+    } else {
+      // Handle error
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+  Future<void> residentialRecentlyapi() async {
+    final response = await http.get(Uri.parse('${recentResidentialProperty}${1}'));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['data'];
+      setState(() {
+        residentialRecentlyProperty = data;
+        isLoading = false;
+      });
+    } else {
+      // Handle error
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+
   Future<void> ResidentialCategory() async {
     final response = await http.get(Uri.parse('${category}${'2'}'));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body)['subcategory'];
       setState(() {
         subcategory = data;
+        isLoading = false;
+      });
+    } else {
+      // Handle error
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+  Future<void> AllCategory() async {
+    final response = await http.get(Uri.parse('${subCategory}'));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['subcategory'];
+      setState(() {
+        allsubcategory = data;
         isLoading = false;
       });
     } else {
@@ -188,6 +246,23 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
     }
   }
 
+  Future<void> allCommercialapi() async {
+    final response = await http.get(Uri.parse(getAllCommercialProperties));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['property'];
+      setState(() {
+        allProperty = data;
+        isLoading = false;
+      });
+    } else {
+      // Handle error
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -207,55 +282,55 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                 padding: const EdgeInsets.all(0.0),
                 child: Column(
                   children: [
-                    Padding(
-                      padding:  EdgeInsets.all(15.sp),
-                      child: Container(
-                        width: double.infinity,
-                        height: 50.sp,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 2,
-                              blurRadius: 7,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                child: TextField(
-                                  style: GoogleFonts.poppins(
-                                    textStyle: TextStyle(
-                                        fontSize: 15.sp,
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.black),
-                                  ),
-                                  decoration: InputDecoration(
-                                    hintText: 'Search',
-                                    border: InputBorder.none,
-                                    prefixIcon:
-                                    Icon(Icons.search, color: Colors.black),
-                                  ),
-                                  textInputAction: TextInputAction.next,
-                                  // This sets the keyboard action to "Next"
-                                  onEditingComplete: () =>
-                                      FocusScope.of(context).nextFocus(),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 0,
-                    ),
+                    // Padding(
+                    //   padding:  EdgeInsets.all(15.sp),
+                    //   child: Container(
+                    //     width: double.infinity,
+                    //     height: 50.sp,
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.white,
+                    //       borderRadius: BorderRadius.circular(10.0),
+                    //       boxShadow: [
+                    //         BoxShadow(
+                    //           color: Colors.grey.withOpacity(0.5),
+                    //           spreadRadius: 2,
+                    //           blurRadius: 7,
+                    //           offset: Offset(0, 3),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //     child: Row(
+                    //       children: [
+                    //         Flexible(
+                    //           child: Padding(
+                    //             padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    //             child: TextField(
+                    //               style: GoogleFonts.poppins(
+                    //                 textStyle: TextStyle(
+                    //                     fontSize: 15.sp,
+                    //                     fontWeight: FontWeight.normal,
+                    //                     color: Colors.black),
+                    //               ),
+                    //               decoration: InputDecoration(
+                    //                 hintText: 'Search',
+                    //                 border: InputBorder.none,
+                    //                 prefixIcon:
+                    //                 Icon(Icons.search, color: Colors.black),
+                    //               ),
+                    //               textInputAction: TextInputAction.next,
+                    //               // This sets the keyboard action to "Next"
+                    //               onEditingComplete: () =>
+                    //                   FocusScope.of(context).nextFocus(),
+                    //             ),
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+                    // SizedBox(
+                    //   height: 0,
+                    // ),
 
                     Column(
                         children: [
@@ -354,121 +429,116 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
 
                     ),
 
-                    // Padding(
-                    //   padding:  EdgeInsets.all(15.sp),
-                    //   child: Container(
-                    //     width: double.infinity,
-                    //     height: 150.sp,
-                    //     decoration: BoxDecoration(
-                    //       color: Colors.white,
-                    //       borderRadius: BorderRadius.circular(10.0),
-                    //       // Rounded corners with radius 10
-                    //       boxShadow: [
-                    //         BoxShadow(
-                    //           color: Colors.grey.withOpacity(0.5),
-                    //           spreadRadius: 2,
-                    //           blurRadius: 7,
-                    //           offset: Offset(0, 3),
-                    //         ),
-                    //       ],
-                    //     ),
-                    //     child: Stack(
-                    //       children: [
-                    //         Container(
-                    //           decoration: BoxDecoration(
-                    //             image: DecorationImage(
-                    //               image: AssetImage(
-                    //                   "assets/customImages/bannerImg.png"),
-                    //               fit: BoxFit.cover,
-                    //             ),
-                    //             borderRadius: BorderRadius.circular(
-                    //                 10.0), // Match the parent container's rounded corners
-                    //           ),
-                    //         ),
-                    //         Container(
-                    //           padding: EdgeInsets.all(16.sp),
-                    //           child: Column(
-                    //             crossAxisAlignment: CrossAxisAlignment.start,
-                    //             children: [
-                    //               Text(
-                    //                 "Real Estate Solutions",
-                    //                 style: GoogleFonts.poppins(
-                    //                   textStyle: TextStyle(
-                    //                       fontSize: 15.sp,
-                    //                       fontWeight: FontWeight.bold,
-                    //                       color: Colors.white),
-                    //                 ),
-                    //               ),
-                    //               SizedBox(
-                    //                 height: 15.sp,
-                    //               ),
-                    //               Text(
-                    //                 "We are here to \n providing best deal \n on properties.",
-                    //                 style: GoogleFonts.poppins(
-                    //                   textStyle: TextStyle(
-                    //                       fontSize: 12.sp,
-                    //                       fontWeight: FontWeight.normal,
-                    //                       color: Colors.white),
-                    //                 ),
-                    //               ),
-                    //               SizedBox(height: 20.sp),
-                    //             ],
-                    //           ),
-                    //         ),
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
+
                   ],
                 ),
               ),
-              SizedBox(
-                height: 50.sp,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: subcategory.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return GestureDetector(
-                      onTap: (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ApartmentListing(backButton: 'back')),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 7.0),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
 
-                            // margin: EdgeInsets.all(12.sp),
-                            padding: EdgeInsets.all(12.0),
-                            decoration: BoxDecoration(
-                              color: HexColor('#f6f6f7'),
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                            child: Center(
-                              child: Padding(
-                                padding:  EdgeInsets.only(left: 8.sp,right: 8.sp),
-                                child: Text(
-                                  subcategory[index]['name'],
-                                  style: GoogleFonts.poppins(
-                                    textStyle: TextStyle(
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.black),
+
+              if(widget.index=='0')
+                Padding(
+                  padding:  EdgeInsets.only(top: 14.sp),
+                  child: SizedBox(
+                    height: 35.sp,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: allsubcategory.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return GestureDetector(
+                          onTap: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ApartmentListing(backButton: 'back')),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 7.0,),
+                            child: Padding(
+                              padding:  EdgeInsets.only(top:3.sp,bottom: 3.sp),
+                              child: Container(
+
+                                // margin: EdgeInsets.all(12.sp),
+                                // padding: EdgeInsets.all(2.sp),
+                                decoration: BoxDecoration(
+                                  color: HexColor('#122636'),
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                child: Center(
+                                  child: Padding(
+                                    padding:  EdgeInsets.only(left: 12.sp,right: 12.sp),
+                                    child: Text(
+                                      allsubcategory[index]['name'],
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: 13.sp,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.white),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                    );
-                  },
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              ),
+              if(widget.index=='1')
+
+                Padding(
+                  padding:  EdgeInsets.only(top: 14.sp),
+                  child: SizedBox(
+                    height: 35.sp,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: subcategory.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return GestureDetector(
+                          onTap: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ApartmentListing(backButton: 'back')),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 7.0,),
+                            child: Padding(
+                              padding:  EdgeInsets.only(top:3.sp,bottom: 3.sp),
+                              child: Container(
+
+                                // margin: EdgeInsets.all(12.sp),
+                                // padding: EdgeInsets.all(2.sp),
+                                decoration: BoxDecoration(
+                                  color: HexColor('#122636'),
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                child: Center(
+                                  child: Padding(
+                                    padding:  EdgeInsets.only(left: 12.sp,right: 12.sp),
+                                    child: Text(
+                                      subcategory[index]['name'],
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: 13.sp,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+
               Padding(
                 padding: const EdgeInsets.all(15.0),
                 child: Row(
@@ -502,18 +572,160 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                   ],
                 ),
               ),
-              SizedBox(
+              if(widget.index=='0')
+
+                SizedBox(
+                height: 430,
+                child: GridView.count(
+                  physics: NeverScrollableScrollPhysics(), // Disable scrolling
+                  crossAxisCount: 2,
+                  children: List.generate(
+                    allRecentlyProperty.length, // Use the length of allProperty
+                        (index) => GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PropertyDeatilsPage(id: allRecentlyProperty[index]['id'].toString()),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: HexColor('#f6f6f7'),
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        margin: EdgeInsets.all(8.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: 90.sp,
+                                width: double.infinity,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: CachedNetworkImage(
+                                    height: 90.sp,
+                                    imageUrl:  allRecentlyProperty[index]['picture_urls'][0].toString(),
+                                    fit: BoxFit.cover, // Adjust this according to your requirement
+                                    placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.orangeAccent,
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) => Image.asset(
+                                      'assets/no_image.jpg', // Path to your default image asset
+                                      height: 90.sp, // Adjust width as per your requirement
+                                      fit: BoxFit.cover, // Adjust this according to your requirement
+                                    ),
+                                  ),
+
+
+
+
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      '${allRecentlyProperty[index]['property_name'].toString()}'.length > 22
+                                          ? '${allRecentlyProperty[index]['property_name'].toString()}'.substring(0, 22) + '...'
+                                          : '${allRecentlyProperty[index]['property_name'].toString()}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on,
+                                      size: 11.sp,
+                                      color: Colors.red,
+                                    ),
+                                    Text(
+                                      '2021 San Pedro, Los Angeles 90'.length > 25
+                                          ? '2021 San Pedro, Los Angeles 90'.substring(0, 25) + '...'
+                                          : '2021 San Pedro, Los Angeles 90',
+                                      maxLines: 1,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                          fontSize: 11.sp,
+                                          fontWeight: FontWeight.normal,
+                                          color: HexColor('#9ba3aa'),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      '₹ ',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                    Text(
+                                      '${allRecentlyProperty[index]['property_price'].toString()}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              if(widget.index=='1')
+
+                SizedBox(
                   height: 430,
                   child: GridView.count(
-                    physics: NeverScrollableScrollPhysics(),
-                    // Disable scrolling
+                    physics: NeverScrollableScrollPhysics(), // Disable scrolling
                     crossAxisCount: 2,
                     children: List.generate(
-                      4,
+                      residentialRecentlyProperty.length, // Use the length of allProperty
                           (index) => GestureDetector(
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> PropertyDeatilsPage(id: '',)),);
-
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PropertyDeatilsPage(id: residentialRecentlyProperty[index]['id'].toString()),
+                            ),
+                          );
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -525,28 +737,41 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-
                               children: [
                                 SizedBox(
-                                    height: 90.sp,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.asset(
-                                        "assets/customImages/testFlatImg.jpg",
-                                        height: 90.sp,
-                                        fit: BoxFit.fill,
+                                  height: 90.sp,
+                                  width: double.infinity,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: CachedNetworkImage(
+                                      height: 90.sp,
+                                      imageUrl:  residentialRecentlyProperty[index]['picture_urls'][0].toString(),
+                                      fit: BoxFit.cover, // Adjust this according to your requirement
+                                      placeholder: (context, url) => const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.orangeAccent,
+                                        ),
                                       ),
-                                    )),
+                                      errorWidget: (context, url, error) => Image.asset(
+                                        'assets/no_image.jpg', // Path to your default image asset
+                                        height: 90.sp, // Adjust width as per your requirement
+                                        fit: BoxFit.cover, // Adjust this according to your requirement
+                                      ),
+                                    ),
+
+
+
+
+                                  ),
+                                ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 5.0),
                                   child: Row(
                                     children: [
                                       Text(
-                                        'Renovated Luxury Apartme'.length > 22
-                                            ? 'Renovated Luxury Apartme'
-                                            .substring(0, 22) +
-                                            '...'
-                                            : 'Renovated Luxury Apartme',
+                                        '${residentialRecentlyProperty[index]['property_name'].toString()}'.length > 22
+                                            ? '${residentialRecentlyProperty[index]['property_name'].toString()}'.substring(0, 22) + '...'
+                                            : '${residentialRecentlyProperty[index]['property_name'].toString()}',
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: GoogleFonts.poppins(
@@ -563,21 +788,14 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                                   padding: const EdgeInsets.only(top: 5.0),
                                   child: Row(
                                     children: [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.location_on,
-                                            size: 11.sp,
-                                            color: Colors.red,
-                                          ),
-                                        ],
+                                      Icon(
+                                        Icons.location_on,
+                                        size: 11.sp,
+                                        color: Colors.red,
                                       ),
                                       Text(
-                                        '2021 San Pedro, Los Angeles 90'.length >
-                                            25
-                                            ? '2021 San Pedro, Los Angeles 90'
-                                            .substring(0, 25) +
-                                            '...'
+                                        '2021 San Pedro, Los Angeles 90'.length > 25
+                                            ? '2021 San Pedro, Los Angeles 90'.substring(0, 25) + '...'
                                             : '2021 San Pedro, Los Angeles 90',
                                         maxLines: 1,
                                         style: GoogleFonts.poppins(
@@ -607,7 +825,7 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                                         ),
                                       ),
                                       Text(
-                                        '5000',
+                                        '${residentialRecentlyProperty[index]['property_price'].toString()}',
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: GoogleFonts.poppins(
@@ -626,9 +844,8 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
                         ),
                       ),
                     ),
-                  )
-              ),
-
+                  ),
+                ),
               // All Property
 
               Padding(
@@ -800,6 +1017,178 @@ class _ResidentialScreenState extends State<ResidentialScreen> {
           ),
         ),
               // All Property
+
+              if(widget.index=='0')
+              Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Row(
+                  children: [
+                    Text(
+                      'Commercial Property',
+                      style: GoogleFonts.poppins(
+                        textStyle: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                    ),
+                    Spacer(),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> AllCommercialProperty()),);
+
+                      },
+                      child: Text(
+                        'View all',
+                        style: GoogleFonts.poppins(
+                          textStyle: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.normal,
+                            color: HexColor('#9ba3aa'),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if(widget.index=='0')
+                SizedBox(
+                height: 430,
+                child: GridView.count(
+                  physics: NeverScrollableScrollPhysics(), // Disable scrolling
+                  crossAxisCount: 2,
+                  children: List.generate(
+                    allProperty.length, // Use the length of allProperty
+                        (index) => GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PropertyDeatilsPage(id: allProperty[index]['id'].toString()),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: HexColor('#f6f6f7'),
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        margin: EdgeInsets.all(8.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: 90.sp,
+                                width: double.infinity,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: CachedNetworkImage(
+                                    height: 90.sp,
+                                    imageUrl:  allProperty[index]['picture_urls'][0].toString(),
+                                    fit: BoxFit.cover, // Adjust this according to your requirement
+                                    placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.orangeAccent,
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) => Image.asset(
+                                      'assets/no_image.jpg', // Path to your default image asset
+                                      height: 90.sp, // Adjust width as per your requirement
+                                      fit: BoxFit.cover, // Adjust this according to your requirement
+                                    ),
+                                  ),
+
+
+
+
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      '${allProperty[index]['property_name'].toString()}'.length > 22
+                                          ? '${allProperty[index]['property_name'].toString()}'.substring(0, 22) + '...'
+                                          : '${allProperty[index]['property_name'].toString()}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on,
+                                      size: 11.sp,
+                                      color: Colors.red,
+                                    ),
+                                    Text(
+                                      '2021 San Pedro, Los Angeles 90'.length > 25
+                                          ? '2021 San Pedro, Los Angeles 90'.substring(0, 25) + '...'
+                                          : '2021 San Pedro, Los Angeles 90',
+                                      maxLines: 1,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                          fontSize: 11.sp,
+                                          fontWeight: FontWeight.normal,
+                                          color: HexColor('#9ba3aa'),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      '₹ ',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                    Text(
+                                      '${allProperty[index]['property_price'].toString()}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
 
 
               if(nearByProperty.isNotEmpty)

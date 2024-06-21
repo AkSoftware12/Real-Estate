@@ -1,5 +1,5 @@
 // var baseUrl = "https://api.astropanditharidwar.in/api/";
-var baseUrl = "https://192.168.1.5/propertymanagement/api/";
+var baseUrl = "https://192.168.1.6/propertymanagement/api/";
 
 
 var register = "${baseUrl}signup";
@@ -11,6 +11,9 @@ var allPropertys = "${baseUrl}allPropertry";
 var getAllResidentialProperties = "${baseUrl}getAllResidentialProperties";
 var getAllCommercialProperties = "${baseUrl}getAllCommercialProperties";
 var category = "${baseUrl}category/";
+var subCategory = "${baseUrl}subCategory";
+var recentProperty = "${baseUrl}recentProperty";
+var recentResidentialProperty = "${baseUrl}recentProperty?category_id=";
 var addProperty = "${baseUrl}addProperty";
 var addPropertyInfo = "${baseUrl}allPropertry/";
 var forgotPassword = "${baseUrl}forgot-password";

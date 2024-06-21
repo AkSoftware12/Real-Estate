@@ -2,10 +2,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:realestate/Commercial/Commercial.dart';
 import 'package:realestate/HexColorCode/HexColor.dart';
 import 'package:realestate/HomeScreen/home_screen.dart';
 import 'package:realestate/PropertyList/residential_property_list.dart';
+import 'package:realestate/Utils/textSize.dart';
 
 
 
@@ -27,7 +30,8 @@ class _HomeSectionState extends State<HomeScreen> with SingleTickerProviderState
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_handleTabSelection);
   }
 
@@ -48,13 +52,14 @@ class _HomeSectionState extends State<HomeScreen> with SingleTickerProviderState
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(00.0),
             child: Container(
+              height: 35.sp,
               child: TabBar(
                 controller: _tabController,
                 indicator: const UnderlineTabIndicator(borderSide: BorderSide.none),
@@ -71,17 +76,47 @@ class _HomeSectionState extends State<HomeScreen> with SingleTickerProviderState
                 tabs: [
                   Tab(
                     child: Container(
-                      height: 50,
+                      height: 50.sp,
                       decoration: BoxDecoration(
                         color: _selectedIndex == 0
                             ? HexColor('#122636')
                             : Colors.grey.shade300,
                         borderRadius: BorderRadius.circular(10),
                       ),
+                      child: Center(child: Text('All',
+
+                        style: GoogleFonts.dmSans(
+                          textStyle: TextStyle(
+                              fontSize: TextSizes.textsmall.sp,
+                              fontWeight: FontWeight.bold,
+                            color: _selectedIndex == 0 ? Colors.white : Colors
+                                .black,
+                          ),
+                        ),
+
+                      ),
+
+                      ),
+                    ),
+                  ),
+
+                  Tab(
+                    child: Container(
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: _selectedIndex == 1
+                            ? HexColor('#122636')
+                            : Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       child: Center(child: Text('Residential',
-                        style: TextStyle(
-                          color: _selectedIndex == 0 ? Colors.white : Colors
-                              .black,
+                        style: GoogleFonts.dmSans(
+                          textStyle: TextStyle(
+                            fontSize: TextSizes.textsmall.sp,
+                            fontWeight: FontWeight.bold,
+                            color: _selectedIndex == 1 ? Colors.white : Colors
+                                .black,
+                          ),
                         ),
                       ),
 
@@ -92,16 +127,20 @@ class _HomeSectionState extends State<HomeScreen> with SingleTickerProviderState
                     child: Container(
                       height: 50,
                       decoration: BoxDecoration(
-                        color: _selectedIndex == 1
+                        color: _selectedIndex == 2
                             ? HexColor('#122636')
                             : Colors.grey.shade300,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Center(child: Text('Commercial',
-                        style: TextStyle(
-                          color: _selectedIndex == 1 ? Colors.white : Colors
-                              .black,
-                        ),
+                          style: GoogleFonts.dmSans(
+                            textStyle: TextStyle(
+                              fontSize: TextSizes.textsmall.sp,
+                              fontWeight: FontWeight.bold,
+                              color: _selectedIndex == 2 ? Colors.white : Colors
+                                  .black,
+                            ),
+                          ),
                       )),
                     ),
                   ),
@@ -113,7 +152,8 @@ class _HomeSectionState extends State<HomeScreen> with SingleTickerProviderState
         body: TabBarView(
           controller: _tabController,
           children: [
-            ResidentialScreen(lat: widget.lat, lag: widget.lng,),
+            ResidentialScreen(lat: widget.lat, lag: widget.lng, index: _selectedIndex.toString(),),
+            ResidentialScreen(lat: widget.lat, lag: widget.lng, index: _selectedIndex.toString(),),
             CommercialScreen(),
           ],
         ),
